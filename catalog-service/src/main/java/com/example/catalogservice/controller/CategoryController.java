@@ -19,7 +19,7 @@ public class CategoryController {
 
     private final CategoryService catergoryService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<Category>> getCategories() {
         return ResponseEntity.ok(catergoryService.getAllCategories());
     }

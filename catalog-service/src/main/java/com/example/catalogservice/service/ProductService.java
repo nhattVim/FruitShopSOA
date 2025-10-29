@@ -2,9 +2,9 @@ package com.example.catalogservice.service;
 
 import java.util.List;
 
-import com.example.catalogservice.entity.Product;
+import com.example.catalogservice.dto.ProductDto;
 
 public interface ProductService {
 
-    List<Product> getAllProducts();
+    List<ProductDto> getAllProducts();
 }
