@@ -17,6 +17,10 @@ public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String skuCode;
+    private Long productId; // Changed from skuCode
     private Integer quantity;
+    private String batchId;
+    private java.time.LocalDate importDate;
+    private java.time.LocalDate expirationDate;
+    private String unitOfMeasure; // e.g., "kg", "box"
 }

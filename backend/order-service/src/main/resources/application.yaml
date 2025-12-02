@@ -1,4 +1,4 @@
-sserver:
+server:
     port: 8083
 
 spring:
@@ -20,7 +20,7 @@ spring:
 
 eureka:
     instance:
-        prefer-ip-address: false
+        prefer-ip-address: true
     client:
         serviceUrl:
             defaultZone: http://localhost:8761/eureka

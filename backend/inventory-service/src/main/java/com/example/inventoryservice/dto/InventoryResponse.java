@@ -5,11 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
 public class InventoryResponse {
-    private String skuCode;
-    private boolean isInStock;
+    private Long id;
+    private Long productId;
+    private Integer quantity;
+    private String batchId;
+    private LocalDate importDate;
+    private LocalDate expirationDate;
+    private String unitOfMeasure;
 }
