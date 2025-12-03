@@ -22,6 +22,12 @@ public class CustomerController {
         customerService.createCustomer(customerRequest);
     }
 
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<CustomerResponse> getAllCustomers() {
+        return customerService.getAllCustomers();
+    }
+
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CustomerResponse getCustomerById(@PathVariable Long id) {

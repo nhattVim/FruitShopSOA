@@ -34,6 +34,14 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
+    public List<CustomerResponse> getAllCustomers() {
+        List<Customer> customers = customerRepository.findAll();
+        return customers.stream()
+                .map(this::mapToCustomerResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public CustomerResponse getCustomerById(Long id) {
         return customerRepository.findById(id)
                 .map(this::mapToCustomerResponse)
