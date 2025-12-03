@@ -1,16 +1,36 @@
 // frontend/src/components/PlaceOrder.jsx
-import React, { useState } from 'react';
-import { placeOrder } from '../api/apiService';
+import React, { useState, useEffect } from 'react';
+import { placeOrder, getAllProducts } from '../api/apiService'; // Import getAllProducts
 
 const PlaceOrder = ({ onOrderPlaced }) => {
   const [order, setOrder] = useState({
     customerId: '',
     orderItems: [{ productId: '', quantity: '' }],
   });
+  const [products, setProducts] = useState([]); // State to store products
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState(null);
+
+  // Fetch products on component mount
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setProductsLoading(true);
+        const data = await getAllProducts();
+        setProducts(data);
+      } catch (err) {
+        setProductsError('Failed to fetch products for dropdown.');
+        console.error('Error fetching products:', err);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const handleCustomerChange = (e) => {
     setOrder((prevOrder) => ({
@@ -52,7 +72,7 @@ const PlaceOrder = ({ onOrderPlaced }) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(false);
+    setSuccess(false); // Reset success state at the beginning of submission
     setOrderNumber('');
 
     // Basic validation
@@ -75,9 +95,9 @@ const PlaceOrder = ({ onOrderPlaced }) => {
           quantity: parseInt(item.quantity, 10),
         })),
       };
-      const response = await placeOrder(orderRequest);
+      const response = await placeOrder(orderRequest); // Expects the order number string
       setSuccess(true);
-      setOrderNumber(response); // Assuming backend returns order number directly
+      setOrderNumber(response);
       setOrder({
         customerId: '',
         orderItems: [{ productId: '', quantity: '' }],
@@ -86,12 +106,18 @@ const PlaceOrder = ({ onOrderPlaced }) => {
         onOrderPlaced(response); // Notify parent of new order number
       }
     } catch (err) {
-      setError(`Failed to place order: ${err.response?.data || err.message}`);
+      // This catch block will be hit if the backend returns a non-2xx status (like 503 from fallback)
+      const errorMessage = err.response?.data || err.message || 'An unknown error occurred.';
+      setError(`Failed to place order: ${errorMessage}`);
+      setSuccess(false); // Explicitly set success to false on error
       console.error('Error placing order:', err);
     } finally {
       setLoading(false);
     }
   };
+
+  if (productsLoading) return <div className="text-center my-4">Loading products for order...</div>;
+  if (productsError) return <div className="alert alert-danger" role="alert">Error loading products: {productsError}</div>;
 
   return (
     <div className="card my-4">
@@ -117,16 +143,22 @@ const PlaceOrder = ({ onOrderPlaced }) => {
           {order.orderItems.map((item, index) => (
             <div key={index} className="row mb-3 align-items-end">
               <div className="col-md-5">
-                <label htmlFor={`productId-${index}`} className="form-label">Product ID:</label>
-                <input
-                  type="number"
-                  className="form-control"
+                <label htmlFor={`productId-${index}`} className="form-label">Product:</label>
+                <select
+                  className="form-select"
                   id={`productId-${index}`}
                   name="productId"
                   value={item.productId}
                   onChange={(e) => handleItemChange(index, e)}
                   required
-                />
+                >
+                  <option value="">-- Select Product --</option>
+                  {products.map((product) => (
+                    <option key={product.id} value={product.id}>
+                      {product.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="col-md-5">
                 <label htmlFor={`quantity-${index}`} className="form-label">Quantity:</label>

@@ -6,12 +6,15 @@ import com.example.orderservice.model.OrderStatus;
 import com.example.orderservice.service.OrderService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j; // Import Slf4j
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
+@Slf4j // Add Slf4j annotation
 public class OrderController {
 
     private final OrderService orderService;
@@ -19,8 +22,9 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
-    public String placeOrder(@RequestBody OrderRequest orderRequest) {
-        return orderService.createOrder(orderRequest);
+    public ResponseEntity<String> placeOrder(@RequestBody OrderRequest orderRequest) {
+        String orderNumber = orderService.createOrder(orderRequest);
+        return new ResponseEntity<>(orderNumber, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -35,7 +39,8 @@ public class OrderController {
         orderService.updateOrderStatus(id, status);
     }
 
-    public String fallbackMethod(OrderRequest orderRequest, RuntimeException runtimeException) {
-        return "Oops! Something went wrong, please order after some time!";
+    public ResponseEntity<String> fallbackMethod(OrderRequest orderRequest, RuntimeException runtimeException) {
+        log.error("Fallback method for placeOrder triggered: {}", runtimeException.getMessage()); // Log the exception
+        return new ResponseEntity<>("Oops! Something went wrong, please order after some time!", HttpStatus.SERVICE_UNAVAILABLE);
     }
 }
