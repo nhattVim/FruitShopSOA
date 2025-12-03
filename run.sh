@@ -5,7 +5,7 @@ set -e
 ROOT_DIR=$(pwd)
 
 declare -A DISCOVERY=(
-    ["discovery-service"]="8761"
+    ["discovery-server"]="8761"
 )
 
 declare -A SERVICES=(

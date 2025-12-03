@@ -10,7 +10,7 @@ set "ROOT_DIR=%cd%"
 title Microservices Launcher
 
 :: Service List (Format: FolderName:Port)
-set "DISCOVERY_SVC=discovery-service:8761"
+set "DISCOVERY_SVC=discovery-server:8761"
 set "GATEWAY_SVC=api-gateway:8080"
 set "MICROSERVICES=customer-service:8081 inventory-service:8082 order-service:8083 payment-service:8084 pricing-service:8085 product-service:8086"
 
