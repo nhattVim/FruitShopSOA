@@ -1,163 +1,113 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal EnableDelayedExpansion
 
-:: ==============================
-:: ROOT DIR
-:: ==============================
+:: ==========================================
+:: 1. CONFIGURATION
+:: ==========================================
+:: Switch to the script's directory (to avoid path errors)
+cd /d "%~dp0"
 set "ROOT_DIR=%cd%"
+title Microservices Launcher
 
-:: ==============================
-:: DISCOVERY SERVICE
-:: ==============================
-set "DISCOVERY_NAME=discovery-service"
-set "DISCOVERY_PORT=8761"
+:: Service List (Format: FolderName:Port)
+set "DISCOVERY_SVC=discovery-service:8761"
+set "GATEWAY_SVC=api-gateway:8080"
+set "MICROSERVICES=customer-service:8081 inventory-service:8082 order-service:8083 payment-service:8084 pricing-service:8085 product-service:8086"
 
-:: ==============================
-:: MICROSERVICES (name port)
-:: ==============================
-set "SERVICES_LIST=customer-service 8081 inventory-service 8082 order-service 8083 payment-service 8084 pricing-service 8085 product-service 8086"
+:: ==========================================
+:: 2. START SEQUENCE
+:: ==========================================
+cls
+echo.
+echo ========================================================
+echo    STARTING INFRASTRUCTURE...
+echo ========================================================
 
-:: ==============================
-:: API GATEWAY
-:: ==============================
-set "GATEWAY_NAME=api-gateway"
-set "GATEWAY_PORT=8080"
-
-:: ==============================
-:: GUI FUNCTION
-:: ==============================
-:show_gui
-set "PS_CMD=Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing;"
-set "PS_CMD=%PS_CMD% $f = New-Object System.Windows.Forms.Form;"
-set "PS_CMD=%PS_CMD% $f.Text = 'Server Manager'; $f.StartPosition = 'CenterScreen'; $f.Width = 450; $f.Height = 250; $f.FormBorderStyle = 'FixedDialog'; $f.MaximizeBox = $false;"
-set "PS_CMD=%PS_CMD% $font = New-Object System.Drawing.Font('Segoe UI', 14, [System.Drawing.FontStyle]::Bold);"
-
-:: Button Start
-set "PS_CMD=%PS_CMD% $b1 = New-Object System.Windows.Forms.Button;"
-set "PS_CMD=%PS_CMD% $b1.Text = 'Start All Services'; $b1.Font = $font; $b1.Top = 30; $b1.Left = 60; $b1.Width = 310; $b1.Height = 60;"
-set "PS_CMD=%PS_CMD% $b1.Add_Click({ $host.SetShouldExit(1); $f.Close() }); $f.Controls.Add($b1);"
-
-:: Button Stop
-set "PS_CMD=%PS_CMD% $b2 = New-Object System.Windows.Forms.Button;"
-set "PS_CMD=%PS_CMD% $b2.Text = 'Stop All Services'; $b2.Font = $font; $b2.Top = 110; $b2.Left = 60; $b2.Width = 310; $b2.Height = 60;"
-set "PS_CMD=%PS_CMD% $b2.Add_Click({ $host.SetShouldExit(2); $f.Close() }); $f.Controls.Add($b2);"
-
-set "PS_CMD=%PS_CMD% $f.ShowDialog() | Out-Null;"
-powershell -NoProfile -Command "%PS_CMD%"
-exit /b %ERRORLEVEL%
-
-:: ==============================
-:: HELPER FUNCTION TO WAIT PORT
-:: ==============================
-:wait_for_port
-:: %1 = port
-:: %2 = service name
-set "PORT=%1"
-set "SERVICE=%2"
-set COUNT=0
-
-:wait_loop
-powershell -Command "try { $tcp = New-Object System.Net.Sockets.TcpClient('localhost',%PORT%); $tcp.Close(); exit 0 } catch { exit 1 }"
-if errorlevel 1 (
-    timeout /t 1 >nul
-    set /a COUNT+=1
-    if !COUNT! GEQ 60 (
-        echo ❌ %SERVICE% failed to start within 30 seconds
-        exit /b 1
-    )
-    goto wait_loop
+:: --- STEP 1: Start Discovery Service ---
+for /f "tokens=1,2 delims=:" %%a in ("%DISCOVERY_SVC%") do (
+    call :LAUNCH "%%a" "%%b"
+    call :WAIT_PORT "%%b" "%%a"
 )
-echo ✅ %SERVICE% started!
+
+:: --- STEP 2: Start Microservices (Parallel) ---
+echo.
+echo ========================================================
+echo    STARTING MICROSERVICES...
+echo ========================================================
+for %%s in (%MICROSERVICES%) do (
+    for /f "tokens=1,2 delims=:" %%a in ("%%s") do (
+        call :LAUNCH "%%a" "%%b"
+    )
+)
+
+:: --- STEP 3: Wait for Microservices to be ready ---
+echo.
+echo [...] Waiting for all microservices to be ready...
+for %%s in (%MICROSERVICES%) do (
+    for /f "tokens=1,2 delims=:" %%a in ("%%s") do (
+        call :WAIT_PORT "%%b" "%%a"
+    )
+)
+
+:: --- STEP 4: Start API Gateway (Last) ---
+echo.
+echo ========================================================
+echo    STARTING API GATEWAY...
+echo ========================================================
+for /f "tokens=1,2 delims=:" %%a in ("%GATEWAY_SVC%") do (
+    call :LAUNCH "%%a" "%%b"
+    call :WAIT_PORT "%%b" "%%a"
+)
+
+echo.
+echo [*] All services started! Exiting launcher...
+timeout /t 3 >nul
+exit
+
+:: ==========================================
+:: 3. FUNCTIONS
+:: ==========================================
+
+:LAUNCH
+:: %1 = Folder Name, %2 = Port
+echo [+] Launching %~1 on port %~2...
+
+:: Check if the directory exists
+if not exist "backend\%~1" (
+    echo [!] Error: Folder "backend\%~1" not found!
+    exit /b 1
+)
+
+:: Start command:
+:: - Window Title: "TenService (Port)"
+:: - cmd /k: Keep the window open to view logs and close manually
+start "%~1" /D "backend\%~1" cmd /k "title %~1 (%~2) & echo Starting %~1... & mvn spring-boot:run"
 exit /b 0
 
-:: ==============================
-:: START FUNCTIONS
-:: ==============================
-:start_discovery
-echo 🚀 Starting %DISCOVERY_NAME% on port %DISCOVERY_PORT%
-cd "%ROOT_DIR%\backend\%DISCOVERY_NAME%" && start "" mvn spring-boot:run
-call :wait_for_port %DISCOVERY_PORT% %DISCOVERY_NAME%
-exit /b 0
+:WAIT_PORT
+:: %1 = Port, %2 = Name
+set "PORT=%~1"
+set "NAME=%~2"
+set /a COUNT=0
 
-:start_services
-set toggle=0
-for %%A in (%SERVICES_LIST%) do (
-    set /a toggle=!toggle!+1
-    if !toggle! EQU 1 (
-        set "SERVICE=%%A"
-    ) else (
-        set "PORT=%%A"
-        set toggle=0
-        echo 🚀 Starting !SERVICE! on port !PORT!
-        cd "%ROOT_DIR%\backend\!SERVICE!" && start "" mvn spring-boot:run
-    )
+echo [...] Checking %NAME%:%PORT%...
+
+:WAIT_LOOP
+:: Use PowerShell to check port (faster and more accurate than telnet)
+powershell -NoProfile -Command "$tcp = New-Object System.Net.Sockets.TcpClient; try { $tcp.Connect('localhost', %PORT%); $tcp.Close(); exit 0 } catch { exit 1 }"
+
+if %ERRORLEVEL% EQU 0 (
+    echo     [OK] %NAME% is UP!
+    exit /b 0
 )
 
-:: Wait for all services
-set toggle=0
-for %%A in (%SERVICES_LIST%) do (
-    set /a toggle=!toggle!+1
-    if !toggle! EQU 1 (
-        set "SERVICE=%%A"
-    ) else (
-        set "PORT=%%A"
-        set toggle=0
-        call :wait_for_port !PORT! !SERVICE!
-    )
+:: Wait 1 second before retrying
+timeout /t 1 >nul
+set /a COUNT+=1
+
+:: Timeout after 60 seconds
+if %COUNT% GEQ 60 (
+    echo     [!] %NAME% timeout. Proceeding anyway...
+    exit /b 1
 )
-exit /b 0
-
-:start_gateway
-echo 🚀 Starting %GATEWAY_NAME% on port %GATEWAY_PORT%
-cd "%ROOT_DIR%\backend\%GATEWAY_NAME%" && start "" mvn spring-boot:run
-call :wait_for_port %GATEWAY_PORT% %GATEWAY_NAME%
-exit /b 0
-
-:start_all
-call :start_discovery
-call :start_services
-call :start_gateway
-echo ✨ All services started successfully!
-pause
-exit /b
-
-:: ==============================
-:: STOP FUNCTION
-:: ==============================
-:stop_ports
-echo 🛑 Stopping all microservices...
-set "PORTS=%DISCOVERY_PORT% %GATEWAY_PORT%"
-set toggle=0
-for %%A in (%SERVICES_LIST%) do (
-    set /a toggle=!toggle!+1
-    if !toggle! EQU 1 (
-        set "SERVICE=%%A"
-    ) else (
-        set "PORT=%%A"
-        set toggle=0
-        set "PORTS=!PORTS! !PORT!"
-    )
-)
-
-for %%P in (%PORTS%) do (
-    for /f "tokens=5" %%i in ('netstat -aon ^| findstr :%%P ^| findstr LISTENING') do (
-        echo 🔪 Killing port %%P (PID %%i)
-        taskkill /PID %%i /F >nul 2>&1
-    )
-)
-echo 🧹 All services stopped!
-pause
-exit /b
-
-:: ==============================
-:: MAIN
-:: ==============================
-call :show_gui
-if %ERRORLEVEL%==1 (
-    call :start_all
-) else if %ERRORLEVEL%==2 (
-    call :stop_ports
-) else (
-    echo Exiting...
-)
-exit /b
+goto :WAIT_LOOP
