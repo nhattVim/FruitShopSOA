@@ -1,0 +1,9 @@
+<div class="container mt-4 text-center">
+  <h2>Order Placed Successfully!</h2>
+  <p class="lead" *ngIf="orderNumber">Your order number is: <strong>{{ orderNumber }}</strong></p>
+  <p class="lead" *ngIf="!orderNumber">Thank you for your order!</p>
+  <div class="mt-4">
+    <a routerLink="/orders/new" class="btn btn-primary me-2">Place Another Order</a>
+    <a routerLink="/products" class="btn btn-secondary">View Products</a>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="container mt-4">
+  <h2>Place New Order</h2>
+  <form [formGroup]="orderForm" (ngSubmit)="placeOrder()">
+    <div class="mb-3">
+      <label for="customerId" class="form-label">Customer</label>
+      <select id="customerId" formControlName="customerId" class="form-select">
+        <option [value]="null" disabled>Select a customer</option>
+        <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }} ({{ customer.email }})</option>
+      </select>
+    </div>
+
+    <h3>Order Items</h3>
+    <div formArrayName="orderItems" class="mb-3">
+      <div *ngFor="let item of orderItems.controls; let i = index" [formGroupName]="i" class="row mb-2">
+        <div class="col-md-5">
+          <select formControlName="productId" class="form-select">
+            <option [value]="null" disabled>Select a product</option>
+            <option *ngFor="let product of products" [value]="product.id">{{ product.name }} - {{ product.price | currency }}</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <input type="number" formControlName="quantity" class="form-control" min="1">
+        </div>
+        <div class="col-md-3">
+          <button type="button" class="btn btn-danger" (click)="removeProduct(i)">Remove</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary" (click)="addProduct()">Add Product</button>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="orderForm.invalid">Place Order</button>
+  </form>
+</div>
