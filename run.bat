@@ -4,15 +4,19 @@ setlocal EnableDelayedExpansion
 :: ==========================================
 :: 1. CONFIGURATION
 :: ==========================================
-:: Switch to the script's directory (to avoid path errors)
+:: Switch to the script's directory
 cd /d "%~dp0"
 set "ROOT_DIR=%cd%"
 title Microservices Launcher
 
 :: Service List (Format: FolderName:Port)
+:: IMPORTANT: These folders must exist inside the "backend" folder
 set "DISCOVERY_SVC=discovery-server:8761"
 set "GATEWAY_SVC=api-gateway:8080"
 set "MICROSERVICES=customer-service:8081 inventory-service:8082 order-service:8083 payment-service:8084 pricing-service:8085 product-service:8086"
+
+:: Frontend Folder Name (Must exist in the same directory as this script)
+set "FRONTEND_DIR=frontend"
 
 :: ==========================================
 :: 2. START SEQUENCE
@@ -49,7 +53,7 @@ for %%s in (%MICROSERVICES%) do (
     )
 )
 
-:: --- STEP 4: Start API Gateway (Last) ---
+:: --- STEP 4: Start API Gateway (Last Backend Service) ---
 echo.
 echo ========================================================
 echo    STARTING API GATEWAY...
@@ -59,9 +63,16 @@ for /f "tokens=1,2 delims=:" %%a in ("%GATEWAY_SVC%") do (
     call :WAIT_PORT "%%b" "%%a"
 )
 
+:: --- STEP 5: Start Frontend (After Backend is ready) ---
 echo.
-echo [*] All services started! Exiting launcher...
-timeout /t 3 >nul
+echo ========================================================
+echo    STARTING FRONTEND...
+echo ========================================================
+call :LAUNCH_FRONTEND "%FRONTEND_DIR%"
+
+echo.
+echo [*] All services & frontend started! Exiting launcher...
+timeout /t 5 >nul
 exit
 
 :: ==========================================
@@ -72,16 +83,29 @@ exit
 :: %1 = Folder Name, %2 = Port
 echo [+] Launching %~1 on port %~2...
 
-:: Check if the directory exists
+:: Check if folder exists inside "backend"
 if not exist "backend\%~1" (
     echo [!] Error: Folder "backend\%~1" not found!
     exit /b 1
 )
 
-:: Start command:
-:: - Window Title: "TenService (Port)"
-:: - cmd /k: Keep the window open to view logs and close manually
+:: Start command
 start "%~1" /D "backend\%~1" cmd /k "title %~1 (%~2) & echo Starting %~1... & mvn spring-boot:run"
+exit /b 0
+
+:LAUNCH_FRONTEND
+:: %1 = Frontend Folder Name
+echo [+] Launching Frontend (%~1)...
+
+:: Check if frontend folder exists in root
+if not exist "%~1" (
+    echo [!] Error: Folder "%~1" not found! Check CONFIGURATION.
+    exit /b 1
+)
+
+:: Start npm install and npm dev/start
+:: NOTE: Changed to 'npm dev' as requested. Change back to 'npm start' if using CRA.
+start "Frontend" /D "%~1" cmd /k "title Frontend & echo Installing dependencies... & call npm install & echo Starting frontend... & call npm run dev"
 exit /b 0
 
 :WAIT_PORT
@@ -93,11 +117,11 @@ set /a COUNT=0
 echo [...] Checking %NAME%:%PORT%...
 
 :WAIT_LOOP
-:: Use PowerShell to check port (faster and more accurate than telnet)
+:: Use PowerShell to check port
 powershell -NoProfile -Command "$tcp = New-Object System.Net.Sockets.TcpClient; try { $tcp.Connect('localhost', %PORT%); $tcp.Close(); exit 0 } catch { exit 1 }"
 
 if %ERRORLEVEL% EQU 0 (
-    echo     [OK] %NAME% is UP!
+    echo      [OK] %NAME% is UP!
     exit /b 0
 )
 
@@ -107,7 +131,7 @@ set /a COUNT+=1
 
 :: Timeout after 60 seconds
 if %COUNT% GEQ 60 (
-    echo     [!] %NAME% timeout. Proceeding anyway...
+    echo      [!] %NAME% timeout. Proceeding anyway...
     exit /b 1
 )
 goto :WAIT_LOOP
