@@ -80,8 +80,10 @@ export const convertUnits = (productId, quantity, fromUnit, toUnit) => get(`/inv
 export const placeOrder = (orderRequest) => post('/order', orderRequest);
 export const getOrderById = (id) => get(`/order/${id}`);
 export const updateOrderStatus = (id, status) => put(`/order/${id}/status?status=${status}`);
+export const getAllOrders = () => get('/order'); // Added for completeness
 
 // --- Customer & Membership Service API ---
+export const getAllCustomers = () => get('/customer'); // Added
 export const createCustomer = (customer) => post('/customer', customer);
 export const getCustomerById = (id) => get(`/customer/${id}`);
 export const updateCustomer = (id, customer) => put(`/customer/${id}`, customer);
@@ -93,11 +95,14 @@ export const getPurchaseHistory = (id) => get(`/customer/${id}/history`);
 export const setProductPrice = (priceRequest) => post('/pricing/price', priceRequest);
 export const getProductPrice = (productId) => get(`/pricing/price/${productId}`);
 export const createPromotion = (promotion) => post('/pricing/promotion', promotion);
+export const getAllPromotions = () => get('/pricing/promotion'); // Added for completeness
 export const applyPromotion = (productId, originalPrice) => get(`/pricing/promotion/apply/${productId}?originalPrice=${originalPrice}`);
 export const createVoucher = (voucher) => post('/pricing/voucher', voucher);
+export const getAllVouchers = () => get('/pricing/voucher'); // Added for completeness
 export const applyVoucher = (voucherCode, orderTotal) => get(`/pricing/voucher/apply?voucherCode=${voucherCode}&orderTotal=${orderTotal}`);
 
 // --- Payment Service API ---
 export const processPayment = (paymentRequest) => post('/payment', paymentRequest);
 export const getPaymentStatusByOrderId = (orderId) => get(`/payment/${orderId}`);
 export const refundPaymentByOrderId = (orderId) => post(`/payment/refund/${orderId}`);
+export const getAllPayments = () => get('/payment'); // Added for completeness

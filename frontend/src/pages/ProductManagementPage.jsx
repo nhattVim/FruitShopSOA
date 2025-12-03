@@ -1,9 +1,9 @@
-// frontend2/src/pages/ProductManagementPage.jsx
+// frontend/src/pages/ProductManagementPage.jsx
 import React, { useState } from 'react';
 import ProductList from '../components/ProductList';
 import AddProduct from '../components/AddProduct';
 import EditProduct from '../components/EditProduct';
-import './ProductManagementPage.css'; // For basic styling of the page
+// import './ProductManagementPage.css'; // Removed, using Bootstrap
 
 const ProductManagementPage = () => {
   const [editingProduct, setEditingProduct] = useState(null); // Stores product object being edited
@@ -34,18 +34,22 @@ const ProductManagementPage = () => {
   };
 
   return (
-    <div className="product-management-page">
-      <h2>Product Management</h2>
+    <div className="container mt-4">
+      <h2 className="mb-4">Product Management</h2>
 
-      <div className="action-buttons">
-        <button onClick={() => {
+      <div className="mb-3 d-flex justify-content-end">
+        <button className="btn btn-success me-2" onClick={() => {
           setShowAddProductForm(true);
           setEditingProduct(null); // Ensure edit form is hidden
-        }}>Add New Product</button>
-        <button onClick={() => {
+        }}>
+          Add New Product
+        </button>
+        <button className="btn btn-info" onClick={() => {
           setShowAddProductForm(false);
           setEditingProduct(null); // Ensure edit form is hidden
-        }}>View All Products</button>
+        }}>
+          View All Products
+        </button>
       </div>
 
       {showAddProductForm && (

@@ -1,7 +1,7 @@
-// frontend2/src/components/EditCategory.jsx
+// frontend/src/components/EditCategory.jsx
 import React, { useState, useEffect } from 'react';
 import { getCategoryById, updateCategory } from '../api/apiService';
-import './EditCategory.css'; // Assuming you'll create this for basic styling
+// import './EditCategory.css'; // Removed, using Bootstrap
 
 const EditCategory = ({ categoryId, onCategoryUpdated, onCancelEdit }) => {
   const [category, setCategory] = useState(null);
@@ -61,45 +61,51 @@ const EditCategory = ({ categoryId, onCategoryUpdated, onCancelEdit }) => {
     }
   };
 
-  if (loading) return <div>Loading category details...</div>;
-  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
-  if (!category) return <div>Category not found or invalid ID.</div>;
+  if (loading) return <div className="text-center my-4">Loading category details...</div>;
+  if (error) return <div className="alert alert-danger" role="alert">Error: {error}</div>;
+  if (!category) return <div className="alert alert-warning" role="alert">Category not found or invalid ID.</div>;
 
   return (
-    <div className="edit-category-container">
-      <h3>Edit Category (ID: {categoryId})</h3>
-      <form onSubmit={handleSubmit} className="edit-category-form">
-        <div className="form-group">
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={category.name || ''}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="description">Description:</label>
-          <textarea
-            id="description"
-            name="description"
-            value={category.description || ''}
-            onChange={handleChange}
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Updating...' : 'Update Category'}
-        </button>
-        {onCancelEdit && (
-          <button type="button" onClick={onCancelEdit} className="cancel-button">
-            Cancel
+    <div className="card my-4">
+      <div className="card-header">
+        <h3>Edit Category (ID: {categoryId})</h3>
+      </div>
+      <div className="card-body">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="name" className="form-label">Name:</label>
+            <input
+              type="text"
+              className="form-control"
+              id="name"
+              name="name"
+              value={category.name || ''}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="description" className="form-label">Description:</label>
+            <textarea
+              className="form-control"
+              id="description"
+              name="description"
+              value={category.description || ''}
+              onChange={handleChange}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary me-2" disabled={loading}>
+            {loading ? 'Updating...' : 'Update Category'}
           </button>
-        )}
-        {error && <p className="error-message">{error}</p>}
-        {success && <p className="success-message">Category updated successfully!</p>}
-      </form>
+          {onCancelEdit && (
+            <button type="button" onClick={onCancelEdit} className="btn btn-secondary">
+              Cancel
+            </button>
+          )}
+          {error && <div className="alert alert-danger mt-3">{error}</div>}
+          {success && <div className="alert alert-success mt-3">Category updated successfully!</div>}
+        </form>
+      </div>
     </div>
   );
 };

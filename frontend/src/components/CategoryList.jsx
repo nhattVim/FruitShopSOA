@@ -1,7 +1,7 @@
-// frontend2/src/components/CategoryList.jsx
+// frontend/src/components/CategoryList.jsx
 import React, { useEffect, useState } from 'react';
 import { getAllCategories, deleteCategory } from '../api/apiService';
-import './CategoryList.css'; // Assuming you'll create this for basic styling
+// import './CategoryList.css'; // Removed, using Bootstrap
 
 const CategoryList = ({ onEditCategory, refreshTrigger }) => {
   const [categories, setCategories] = useState([]);
@@ -37,39 +37,49 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
     }
   };
 
-  if (loading) return <div>Loading categories...</div>;
-  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
+  if (loading) return <div className="text-center my-4">Loading categories...</div>;
+  if (error) return <div className="alert alert-danger" role="alert">Error: {error}</div>;
 
   return (
-    <div className="category-list-container">
-      <h3>Available Categories</h3>
-      {categories.length === 0 ? (
-        <p>No categories found. Add some!</p>
-      ) : (
-        <table className="category-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category) => (
-              <tr key={category.id}>
-                <td>{category.id}</td>
-                <td>{category.name}</td>
-                <td>{category.description}</td>
-                <td>
-                  <button onClick={() => onEditCategory(category)}>Edit</button>
-                  <button onClick={() => handleDelete(category.id)} className="delete-button">Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+    <div className="card my-4">
+      <div className="card-header">
+        <h3>Available Categories</h3>
+      </div>
+      <div className="card-body">
+        {categories.length === 0 ? (
+          <p className="text-center">No categories found. Add some!</p>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {categories.map((category) => (
+                  <tr key={category.id}>
+                    <td>{category.id}</td>
+                    <td>{category.name}</td>
+                    <td>{category.description}</td>
+                    <td>
+                      <button onClick={() => onEditCategory(category)} className="btn btn-sm btn-primary me-2">
+                        Edit
+                      </button>
+                      <button onClick={() => handleDelete(category.id)} className="btn btn-sm btn-danger">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

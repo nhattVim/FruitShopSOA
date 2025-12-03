@@ -4,24 +4,24 @@ setlocal enabledelayedexpansion
 :: ==============================
 :: ROOT DIR
 :: ==============================
-set ROOT_DIR=%cd%
+set "ROOT_DIR=%cd%"
 
 :: ==============================
 :: DISCOVERY SERVICE
 :: ==============================
-set DISCOVERY_NAME=discovery-service
-set DISCOVERY_PORT=8761
+set "DISCOVERY_NAME=discovery-service"
+set "DISCOVERY_PORT=8761"
 
 :: ==============================
-:: MICROSERVICES
+:: MICROSERVICES (name port)
 :: ==============================
-set SERVICES_LIST=customer-service 8081 inventory-service 8082 order-service 8083 payment-service 8084 pricing-service 8085 product-service 8086
+set "SERVICES_LIST=customer-service 8081 inventory-service 8082 order-service 8083 payment-service 8084 pricing-service 8085 product-service 8086"
 
 :: ==============================
 :: API GATEWAY
 :: ==============================
-set GATEWAY_NAME=api-gateway
-set GATEWAY_PORT=8080
+set "GATEWAY_NAME=api-gateway"
+set "GATEWAY_PORT=8080"
 
 :: ==============================
 :: GUI FUNCTION
@@ -42,7 +42,6 @@ set "PS_CMD=%PS_CMD% $b2 = New-Object System.Windows.Forms.Button;"
 set "PS_CMD=%PS_CMD% $b2.Text = 'Stop All Services'; $b2.Font = $font; $b2.Top = 110; $b2.Left = 60; $b2.Width = 310; $b2.Height = 60;"
 set "PS_CMD=%PS_CMD% $b2.Add_Click({ $host.SetShouldExit(2); $f.Close() }); $f.Controls.Add($b2);"
 
-:: Show Form
 set "PS_CMD=%PS_CMD% $f.ShowDialog() | Out-Null;"
 powershell -NoProfile -Command "%PS_CMD%"
 exit /b %ERRORLEVEL%
@@ -53,8 +52,8 @@ exit /b %ERRORLEVEL%
 :wait_for_port
 :: %1 = port
 :: %2 = service name
-set PORT=%1
-set SERVICE=%2
+set "PORT=%1"
+set "SERVICE=%2"
 set COUNT=0
 
 :wait_loop
@@ -62,7 +61,7 @@ powershell -Command "try { $tcp = New-Object System.Net.Sockets.TcpClient('local
 if errorlevel 1 (
     timeout /t 1 >nul
     set /a COUNT+=1
-    if !COUNT! GEQ 30 (
+    if !COUNT! GEQ 60 (
         echo ❌ %SERVICE% failed to start within 30 seconds
         exit /b 1
     )
@@ -81,31 +80,31 @@ call :wait_for_port %DISCOVERY_PORT% %DISCOVERY_NAME%
 exit /b 0
 
 :start_services
-setlocal enabledelayedexpansion
+set toggle=0
 for %%A in (%SERVICES_LIST%) do (
     set /a toggle=!toggle!+1
     if !toggle! EQU 1 (
-        set SERVICE=%%A
+        set "SERVICE=%%A"
     ) else (
-        set PORT=%%A
+        set "PORT=%%A"
         set toggle=0
         echo 🚀 Starting !SERVICE! on port !PORT!
         cd "%ROOT_DIR%\backend\!SERVICE!" && start "" mvn spring-boot:run
     )
 )
+
 :: Wait for all services
 set toggle=0
 for %%A in (%SERVICES_LIST%) do (
     set /a toggle=!toggle!+1
     if !toggle! EQU 1 (
-        set SERVICE=%%A
+        set "SERVICE=%%A"
     ) else (
-        set PORT=%%A
+        set "PORT=%%A"
         set toggle=0
         call :wait_for_port !PORT! !SERVICE!
     )
 )
-endlocal
 exit /b 0
 
 :start_gateway
@@ -127,25 +126,19 @@ exit /b
 :: ==============================
 :stop_ports
 echo 🛑 Stopping all microservices...
-
-:: Discovery + Gateway
-set PORTS=%DISCOVERY_PORT% %GATEWAY_PORT%
-
-:: Services
-setlocal enabledelayedexpansion
+set "PORTS=%DISCOVERY_PORT% %GATEWAY_PORT%"
+set toggle=0
 for %%A in (%SERVICES_LIST%) do (
     set /a toggle=!toggle!+1
     if !toggle! EQU 1 (
-        set SERVICE=%%A
+        set "SERVICE=%%A"
     ) else (
-        set PORT=%%A
+        set "PORT=%%A"
         set toggle=0
-        set PORTS=!PORTS! !PORT!
+        set "PORTS=!PORTS! !PORT!"
     )
 )
-endlocal
 
-:: Kill all ports
 for %%P in (%PORTS%) do (
     for /f "tokens=5" %%i in ('netstat -aon ^| findstr :%%P ^| findstr LISTENING') do (
         echo 🔪 Killing port %%P (PID %%i)

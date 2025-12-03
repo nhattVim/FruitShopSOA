@@ -1,7 +1,7 @@
-// frontend2/src/components/AddCategory.jsx
+// frontend/src/components/AddCategory.jsx
 import React, { useState } from 'react';
 import { createCategory } from '../api/apiService';
-import './AddCategory.css'; // Assuming you'll create this for basic styling
+// import './AddCategory.css'; // Removed, using Bootstrap
 
 const AddCategory = ({ onCategoryAdded }) => {
   const [category, setCategory] = useState({
@@ -52,35 +52,41 @@ const AddCategory = ({ onCategoryAdded }) => {
   };
 
   return (
-    <div className="add-category-container">
-      <h3>Add New Category</h3>
-      <form onSubmit={handleSubmit} className="add-category-form">
-        <div className="form-group">
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={category.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="description">Description:</label>
-          <textarea
-            id="description"
-            name="description"
-            value={category.description}
-            onChange={handleChange}
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Adding...' : 'Add Category'}
-        </button>
-        {error && <p className="error-message">{error}</p>}
-        {success && <p className="success-message">Category added successfully!</p>}
-      </form>
+    <div className="card my-4">
+      <div className="card-header">
+        <h3>Add New Category</h3>
+      </div>
+      <div className="card-body">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="name" className="form-label">Name:</label>
+            <input
+              type="text"
+              className="form-control"
+              id="name"
+              name="name"
+              value={category.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="description" className="form-label">Description:</label>
+            <textarea
+              className="form-control"
+              id="description"
+              name="description"
+              value={category.description}
+              onChange={handleChange}
+            />
+          </div>
+          <button type="submit" className="btn btn-success" disabled={loading}>
+            {loading ? 'Adding...' : 'Add Category'}
+          </button>
+          {error && <div className="alert alert-danger mt-3">{error}</div>}
+          {success && <div className="alert alert-success mt-3">Category added successfully!</div>}
+        </form>
+      </div>
     </div>
   );
 };

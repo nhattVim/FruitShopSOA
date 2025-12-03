@@ -1,9 +1,9 @@
-// frontend2/src/pages/CategoryManagementPage.jsx
+// frontend/src/pages/CategoryManagementPage.jsx
 import React, { useState } from 'react';
 import CategoryList from '../components/CategoryList';
 import AddCategory from '../components/AddCategory';
 import EditCategory from '../components/EditCategory';
-import './CategoryManagementPage.css'; // For basic styling of the page
+// import './CategoryManagementPage.css'; // Removed, using Bootstrap
 
 const CategoryManagementPage = () => {
   const [editingCategory, setEditingCategory] = useState(null); // Stores category object being edited
@@ -34,18 +34,22 @@ const CategoryManagementPage = () => {
   };
 
   return (
-    <div className="category-management-page">
-      <h2>Category Management</h2>
+    <div className="container mt-4">
+      <h2 className="mb-4">Category Management</h2>
 
-      <div className="action-buttons">
-        <button onClick={() => {
+      <div className="mb-3 d-flex justify-content-end">
+        <button className="btn btn-success me-2" onClick={() => {
           setShowAddCategoryForm(true);
           setEditingCategory(null); // Ensure edit form is hidden
-        }}>Add New Category</button>
-        <button onClick={() => {
+        }}>
+          Add New Category
+        </button>
+        <button className="btn btn-info" onClick={() => {
           setShowAddCategoryForm(false);
           setEditingCategory(null); // Ensure edit form is hidden
-        }}>View All Categories</button>
+        }}>
+          View All Categories
+        </button>
       </div>
 
       {showAddCategoryForm && (

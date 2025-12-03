@@ -1,7 +1,7 @@
-// frontend2/src/components/EditProduct.jsx
+// frontend/src/components/EditProduct.jsx
 import React, { useState, useEffect } from 'react';
 import { getProductById, updateProduct } from '../api/apiService';
-import './EditProduct.css'; // Assuming you'll create this for basic styling
+// import './EditProduct.css'; // Removed, using Bootstrap
 
 const EditProduct = ({ productId, onProductUpdated, onCancelEdit }) => {
   const [product, setProduct] = useState(null);
@@ -66,78 +66,87 @@ const EditProduct = ({ productId, onProductUpdated, onCancelEdit }) => {
     }
   };
 
-  if (loading) return <div>Loading product details...</div>;
-  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
-  if (!product) return <div>Product not found or invalid ID.</div>;
+  if (loading) return <div className="text-center my-4">Loading product details...</div>;
+  if (error) return <div className="alert alert-danger" role="alert">Error: {error}</div>;
+  if (!product) return <div className="alert alert-warning" role="alert">Product not found or invalid ID.</div>;
 
   return (
-    <div className="edit-product-container">
-      <h3>Edit Product (ID: {productId})</h3>
-      <form onSubmit={handleSubmit} className="edit-product-form">
-        <div className="form-group">
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={product.name || ''}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="description">Description:</label>
-          <textarea
-            id="description"
-            name="description"
-            value={product.description || ''}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="price">Price:</label>
-          <input
-            type="number"
-            id="price"
-            name="price"
-            value={product.price || ''}
-            onChange={handleChange}
-            step="0.01"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="imageUrl">Image URL:</label>
-          <input
-            type="text"
-            id="imageUrl"
-            name="imageUrl"
-            value={product.imageUrl || ''}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="categoryId">Category ID:</label>
-          <input
-            type="number"
-            id="categoryId"
-            name="categoryId"
-            value={product.categoryId || ''}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Updating...' : 'Update Product'}
-        </button>
-        {onCancelEdit && (
-          <button type="button" onClick={onCancelEdit} className="cancel-button">
-            Cancel
+    <div className="card my-4">
+      <div className="card-header">
+        <h3>Edit Product (ID: {productId})</h3>
+      </div>
+      <div className="card-body">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="name" className="form-label">Name:</label>
+            <input
+              type="text"
+              className="form-control"
+              id="name"
+              name="name"
+              value={product.name || ''}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="description" className="form-label">Description:</label>
+            <textarea
+              className="form-control"
+              id="description"
+              name="description"
+              value={product.description || ''}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="price" className="form-label">Price:</label>
+            <input
+              type="number"
+              className="form-control"
+              id="price"
+              name="price"
+              value={product.price || ''}
+              onChange={handleChange}
+              step="0.01"
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="imageUrl" className="form-label">Image URL:</label>
+            <input
+              type="text"
+              className="form-control"
+              id="imageUrl"
+              name="imageUrl"
+              value={product.imageUrl || ''}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="categoryId" className="form-label">Category ID:</label>
+            <input
+              type="number"
+              className="form-control"
+              id="categoryId"
+              name="categoryId"
+              value={product.categoryId || ''}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary me-2" disabled={loading}>
+            {loading ? 'Updating...' : 'Update Product'}
           </button>
-        )}
-        {error && <p className="error-message">{error}</p>}
-        {success && <p className="success-message">Product updated successfully!</p>}
-      </form>
+          {onCancelEdit && (
+            <button type="button" onClick={onCancelEdit} className="btn btn-secondary">
+              Cancel
+            </button>
+          )}
+          {error && <div className="alert alert-danger mt-3">{error}</div>}
+          {success && <div className="alert alert-success mt-3">Product updated successfully!</div>}
+        </form>
+      </div>
     </div>
   );
 };
