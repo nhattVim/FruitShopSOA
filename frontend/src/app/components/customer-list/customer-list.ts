@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CustomerService } from '../../services/customer.service';
+import { CustomerService } from '../../services/customer';
 import { Customer } from '../../models/customer.model';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';

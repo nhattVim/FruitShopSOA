@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CustomerService } from '../../services/customer.service';
+import { CustomerService } from '../../services/customer';
 import { CommonModule } from '@angular/common';
 
 @Component({

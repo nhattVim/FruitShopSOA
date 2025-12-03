@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ProductService } from '../../services/product.service';
-import { CustomerService } from '../../services/customer.service';
-import { OrderService } from '../../services/order.service';
+import { ProductService } from '../../services/product';
+import { CustomerService } from '../../services/customer';
+import { OrderService } from '../../services/order';
 import { Product } from '../../models/product.model';
 import { Customer } from '../../models/customer.model';
 import { OrderRequest, OrderItemRequest } from '../../models/order.model';

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ProductService } from '../../services/product.service';
-import { CategoryService } from '../../services/category.service';
+import { ProductService } from '../../services/product';
+import { CategoryService } from '../../services/category';
 import { Product } from '../../models/product.model';
 import { Category } from '../../models/category.model';
 import { CommonModule } from '@angular/common';

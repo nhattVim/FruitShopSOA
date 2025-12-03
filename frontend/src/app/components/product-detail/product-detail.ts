@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ProductService } from '../../services/product.service';
-import { InventoryService } from '../../services/inventory.service';
+import { ProductService } from '../../services/product';
+import { InventoryService } from '../../services/inventory';
 import { Product } from '../../models/product.model';
 import { InventoryResponse } from '../../models/inventory.model';
 import { CommonModule } from '@angular/common';
