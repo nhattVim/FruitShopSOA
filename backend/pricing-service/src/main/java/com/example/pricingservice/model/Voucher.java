@@ -22,7 +22,7 @@ public class Voucher {
     private Long id;
     private String code;
     private String discountType; // e.g., "PERCENTAGE", "FIXED"
-    private Double value; // e.g., 10.0 for 10% or $10
+    private Double voucherValue; // e.g., 10.0 for 10% or $10
     private Double minOrderAmount;
     private Integer usageLimit;
     private Integer usedCount; // To track how many times this voucher has been used

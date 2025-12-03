@@ -25,8 +25,8 @@ public class Promotion {
     private Long id;
     private String name;
     private String description;
-    private String type; // e.g., "BOGO", "PercentageDiscount", "FixedDiscount"
-    private Double value; // e.g., 0.10 for 10% discount, 5.00 for $5 fixed discount
+    private String promotionType; // e.g., "BOGO", "PercentageDiscount", "FixedDiscount"
+    private Double promotionValue; // e.g., 0.10 for 10% discount, 5.00 for $5 fixed discount
     @ElementCollection
     @CollectionTable(name = "promotion_products")
     private List<Long> productIds; // IDs of products to which the promotion applies

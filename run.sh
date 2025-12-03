@@ -80,12 +80,14 @@ stop_ports() {
     for p in "${GATEWAY[@]}"; do ports+=("$p"); done
 
     for port in "${ports[@]}"; do
-        pid=$(lsof -t -i:"$port")
-        if [ -n "$pid" ]; then
-            echo "🔪 Killing port $port (PID $pid)"
-            kill -9 "$pid" 2>/dev/null || true
-        else
+        pids=$(lsof -t -i:"$port" 2>/dev/null || true)
+        if [ -z "$pids" ]; then
             echo "⚠️ Port $port not running"
+        else
+            for pid in $pids; do
+                echo "🔪 Killing port $port (PID $pid)"
+                kill -9 "$pid" 2>/dev/null || true
+            done
         fi
     done
 }

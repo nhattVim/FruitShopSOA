@@ -50,8 +50,8 @@ public class PricingService {
         Promotion promotion = Promotion.builder()
                 .name(promotionRequest.getName())
                 .description(promotionRequest.getDescription())
-                .type(promotionRequest.getType())
-                .value(promotionRequest.getValue())
+                .promotionType(promotionRequest.getType())
+                .promotionValue(promotionRequest.getValue())
                 .productIds(promotionRequest.getProductIds())
                 .startDate(promotionRequest.getStartDate())
                 .endDate(promotionRequest.getEndDate())
@@ -69,10 +69,10 @@ public class PricingService {
         BigDecimal finalPrice = originalPrice;
         for (Promotion promotion : activePromotions) {
             // Simple logic: apply one promotion, more complex logic (e.g., best discount) can be added
-            if ("PercentageDiscount".equalsIgnoreCase(promotion.getType())) {
-                finalPrice = finalPrice.subtract(originalPrice.multiply(BigDecimal.valueOf(promotion.getValue())));
-            } else if ("FixedDiscount".equalsIgnoreCase(promotion.getType())) {
-                finalPrice = finalPrice.subtract(BigDecimal.valueOf(promotion.getValue()));
+            if ("PercentageDiscount".equalsIgnoreCase(promotion.getPromotionType())) {
+                finalPrice = finalPrice.subtract(originalPrice.multiply(BigDecimal.valueOf(promotion.getPromotionValue())));
+            } else if ("FixedDiscount".equalsIgnoreCase(promotion.getPromotionType())) {
+                finalPrice = finalPrice.subtract(BigDecimal.valueOf(promotion.getPromotionValue()));
             }
             // "BOGO" and other types would require more complex application logic and potentially order context
         }
@@ -84,7 +84,7 @@ public class PricingService {
         Voucher voucher = Voucher.builder()
                 .code(voucherRequest.getCode())
                 .discountType(voucherRequest.getDiscountType())
-                .value(voucherRequest.getValue())
+                .voucherValue(voucherRequest.getValue())
                 .minOrderAmount(voucherRequest.getMinOrderAmount())
                 .usageLimit(voucherRequest.getUsageLimit())
                 .usedCount(0) // Initialize used count
@@ -111,9 +111,9 @@ public class PricingService {
 
                 BigDecimal discountedTotal = orderTotal;
                 if ("PERCENTAGE".equalsIgnoreCase(voucher.getDiscountType())) {
-                    discountedTotal = orderTotal.subtract(orderTotal.multiply(BigDecimal.valueOf(voucher.getValue()).divide(BigDecimal.valueOf(100))));
+                    discountedTotal = orderTotal.subtract(orderTotal.multiply(BigDecimal.valueOf(voucher.getVoucherValue()).divide(BigDecimal.valueOf(100))));
                 } else if ("FIXED".equalsIgnoreCase(voucher.getDiscountType())) {
-                    discountedTotal = orderTotal.subtract(BigDecimal.valueOf(voucher.getValue()));
+                    discountedTotal = orderTotal.subtract(BigDecimal.valueOf(voucher.getVoucherValue()));
                 }
                 voucher.setUsedCount(voucher.getUsedCount() + 1);
                 voucherRepository.save(voucher);
@@ -144,8 +144,8 @@ public class PricingService {
                 .id(promotion.getId())
                 .name(promotion.getName())
                 .description(promotion.getDescription())
-                .type(promotion.getType())
-                .value(promotion.getValue())
+                .type(promotion.getPromotionType())
+                .value(promotion.getPromotionValue())
                 .productIds(promotion.getProductIds())
                 .startDate(promotion.getStartDate())
                 .endDate(promotion.getEndDate())
@@ -158,7 +158,7 @@ public class PricingService {
                 .id(voucher.getId())
                 .code(voucher.getCode())
                 .discountType(voucher.getDiscountType())
-                .value(voucher.getValue())
+                .value(voucher.getVoucherValue())
                 .minOrderAmount(voucher.getMinOrderAmount())
                 .usageLimit(voucher.getUsageLimit())
                 .usedCount(voucher.getUsedCount())
