@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
+import { useState } from "react";
 import ProductManagementPage from "./pages/ProductManagementPage";
 import CategoryManagementPage from "./pages/CategoryManagementPage";
 import InventoryDetailPage from "./pages/InventoryDetailPage";
@@ -8,7 +9,7 @@ import OrderDetailPage from "./pages/OrderDetailPage";
 import PricingPromotionPage from "./pages/PricingPromotionPage";
 
 const Home = () => (
-    <div className="container-fluid mt-4">
+    <div className="container-fluid">
         <div className="row">
             <div className="col-12">
                 <div className="card shadow-sm border-0">
@@ -78,7 +79,7 @@ const Home = () => (
 );
 
 const NotFound = () => (
-    <div className="container-fluid mt-4">
+    <div className="container-fluid">
         <div className="row justify-content-center">
             <div className="col-md-6">
                 <div className="card shadow-sm border-0 text-center">
@@ -98,72 +99,144 @@ const NotFound = () => (
 );
 
 function App() {
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
+
     return (
         <Router>
-            <div className="App">
-                <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-                    <div className="container-fluid">
-                        <Link className="navbar-brand fw-bold" to="/">
-                            <i className="bi bi-shop me-2"></i>
-                            Fruit Shop Admin
-                        </Link>
-                        <button
-                            className="navbar-toggler"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navbarNav"
-                            aria-controls="navbarNav"
-                            aria-expanded="false"
-                            aria-label="Toggle navigation"
-                        >
-                            <span className="navbar-toggler-icon"></span>
-                        </button>
-                        <div className="collapse navbar-collapse" id="navbarNav">
-                            <ul className="navbar-nav ms-auto">
-                                <NavLink to="/" label="Home" icon="bi-house" />
-                                <NavLink to="/products" label="Products" icon="bi-box-seam" />
-                                <NavLink to="/categories" label="Categories" icon="bi-tags" />
-                                <NavLink to="/inventory" label="Inventory" icon="bi-archive" />
-                                <NavLink to="/customers" label="Customers" icon="bi-people" />
-                                <NavLink to="/orders" label="Orders" icon="bi-receipt" />
-                                <NavLink to="/pricing" label="Pricing" icon="bi-currency-dollar" />
-                            </ul>
-                        </div>
+            <div className="App d-flex">
+                {/* Sidebar */}
+                <Sidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
+                
+                {/* Main Content */}
+                <div className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+                    {/* Top Bar */}
+                    <TopBar onToggleSidebar={toggleSidebar} />
+                    
+                    {/* Page Content */}
+                    <div className="content-wrapper">
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/products" element={<ProductManagementPage />} />
+                            <Route path="/categories" element={<CategoryManagementPage />} />
+                            <Route path="/inventory" element={<InventoryDetailPage />} />
+                            <Route path="/customers" element={<CustomerManagementPage />} />
+                            <Route path="/orders" element={<OrderManagementPage />} />
+                            <Route path="/orders/:id" element={<OrderDetailPage />} />
+                            <Route path="/pricing" element={<PricingPromotionPage />} />
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
                     </div>
-                </nav>
-
-                <div className="container-fluid mt-4">
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/products" element={<ProductManagementPage />} />
-                        <Route path="/categories" element={<CategoryManagementPage />} />
-                        <Route path="/inventory" element={<InventoryDetailPage />} />
-                        <Route path="/customers" element={<CustomerManagementPage />} />
-                        <Route path="/orders" element={<OrderManagementPage />} />
-                        <Route path="/orders/:id" element={<OrderDetailPage />} />
-                        <Route path="/pricing" element={<PricingPromotionPage />} />
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
                 </div>
             </div>
         </Router>
     );
 }
 
-function NavLink({ to, label, icon }) {
+function Sidebar({ isOpen, onToggle }) {
     const location = useLocation();
-    const isActive = location.pathname === to;
-    
+
+    const menuItems = [
+        { to: "/", label: "Home", icon: "bi-house" },
+        { to: "/products", label: "Products", icon: "bi-box-seam" },
+        { to: "/categories", label: "Categories", icon: "bi-tags" },
+        { to: "/inventory", label: "Inventory", icon: "bi-archive" },
+        { to: "/customers", label: "Customers", icon: "bi-people" },
+        { to: "/orders", label: "Orders", icon: "bi-receipt" },
+        { to: "/pricing", label: "Pricing", icon: "bi-currency-dollar" },
+    ];
+
     return (
-        <li className="nav-item">
-            <Link 
-                className={`nav-link ${isActive ? 'active fw-semibold' : ''}`} 
-                to={to}
-            >
-                <i className={`${icon} me-1`}></i>
-                {label}
-            </Link>
-        </li>
+        <>
+            {/* Sidebar Overlay for Mobile */}
+            {isOpen && (
+                <div 
+                    className="sidebar-overlay d-lg-none" 
+                    onClick={onToggle}
+                ></div>
+            )}
+            
+            {/* Sidebar */}
+            <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
+                <div className="sidebar-header">
+                    <div className="d-flex align-items-center">
+                        <i className="bi bi-shop fs-3 text-white me-2"></i>
+                        {isOpen && <span className="sidebar-brand">Fruit Shop</span>}
+                    </div>
+                    <button 
+                        className="btn btn-link text-white p-0 sidebar-toggle"
+                        onClick={onToggle}
+                        title={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+                    >
+                        <i className={`bi ${isOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
+                    </button>
+                </div>
+                
+                <nav className="sidebar-nav">
+                    <ul className="nav flex-column">
+                        {menuItems.map((item) => {
+                            const isActive = location.pathname === item.to || 
+                                (item.to !== "/" && location.pathname.startsWith(item.to));
+                            return (
+                                <li key={item.to} className="nav-item">
+                                    <Link
+                                        className={`nav-link ${isActive ? 'active' : ''}`}
+                                        to={item.to}
+                                        onClick={() => {
+                                            // Close sidebar on mobile when link is clicked
+                                            if (window.innerWidth < 992) {
+                                                onToggle();
+                                            }
+                                        }}
+                                    >
+                                        <i className={`${item.icon} me-3`}></i>
+                                        {isOpen && <span>{item.label}</span>}
+                                    </Link>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </nav>
+                
+                {isOpen && (
+                    <div className="sidebar-footer">
+                        <div className="text-muted small px-3 py-2">
+                            <i className="bi bi-info-circle me-2"></i>
+                            Fruit Shop Admin v1.0
+                        </div>
+                    </div>
+                )}
+            </aside>
+        </>
+    );
+}
+
+function TopBar({ onToggleSidebar }) {
+    return (
+        <header className="topbar">
+            <div className="d-flex align-items-center justify-content-between w-100">
+                <button
+                    className="btn btn-link text-dark sidebar-toggle-btn"
+                    onClick={onToggleSidebar}
+                    type="button"
+                >
+                    <i className="bi bi-list fs-4"></i>
+                </button>
+                <div className="d-flex align-items-center">
+                    <h5 className="mb-0 me-3 d-none d-md-block">
+                        <i className="bi bi-shop me-2 text-primary"></i>
+                        Fruit Shop Management System
+                    </h5>
+                    <div className="text-muted small d-none d-lg-block">
+                        <i className="bi bi-calendar3 me-1"></i>
+                        {new Date().toLocaleDateString()}
+                    </div>
+                </div>
+            </div>
+        </header>
     );
 }
 
