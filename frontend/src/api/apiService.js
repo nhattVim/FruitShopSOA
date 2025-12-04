@@ -68,6 +68,7 @@ export const updateCategory = (id, category) => put(`/category/${id}`, category)
 export const deleteCategory = (id) => remove(`/category/${id}`);
 
 // --- Inventory Service API ---
+export const getAllInventory = () => get('/inventory');
 export const isProductInStock = (productId) => get(`/inventory/inStock/${productId}`);
 export const recordInboundInventory = (inventory) => post('/inventory/inbound', inventory);
 export const deductStock = (productId, quantity) => post(`/inventory/outbound/${productId}?quantity=${quantity}`);

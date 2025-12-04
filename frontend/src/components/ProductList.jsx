@@ -37,51 +37,110 @@ const ProductList = ({ onEditProduct, refreshTrigger }) => {
     }
   };
 
-  if (loading) return <div className="text-center my-4">Loading products...</div>;
-  if (error) return <div className="alert alert-danger" role="alert">Error: {error}</div>;
+  if (loading) {
+    return (
+      <div className="card shadow-sm border-0">
+        <div className="card-body text-center py-5">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-3 text-muted">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-danger d-flex align-items-center" role="alert">
+        <i className="bi bi-exclamation-circle me-2"></i>
+        <div>Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="card my-4">
-      <div className="card-header">
-        <h3>Available Products</h3>
+    <div className="card shadow-sm border-0">
+      <div className="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 className="mb-0">
+          <i className="bi bi-list-ul me-2"></i>
+          All Products
+        </h5>
+        <button className="btn btn-sm btn-outline-primary" onClick={fetchProducts}>
+          <i className="bi bi-arrow-clockwise me-1"></i>
+          Refresh
+        </button>
       </div>
       <div className="card-body">
         {products.length === 0 ? (
-          <p className="text-center">No products found. Add some!</p>
+          <div className="text-center py-5">
+            <i className="bi bi-inbox display-1 text-muted"></i>
+            <p className="mt-3 text-muted">No products found. Add your first product to get started!</p>
+          </div>
         ) : (
           <div className="table-responsive">
-            <table className="table table-striped table-hover">
-              <thead>
+            <table className="table table-hover align-middle">
+              <thead className="table-light">
                 <tr>
                   <th>ID</th>
                   <th>Name</th>
                   <th>Description</th>
-                  <th>Price</th>
-                  <th>Image URL</th>
-                  <th>Category ID</th>
-                  <th>Actions</th>
+                  <th className="text-end">Price</th>
+                  <th className="text-center">Image</th>
+                  <th>Category</th>
+                  <th className="text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((product) => (
                   <tr key={product.id}>
-                    <td>{product.id}</td>
-                    <td>{product.name}</td>
-                    <td>{product.description}</td>
-                    <td>${product.price ? product.price.toFixed(2) : 'N/A'}</td>
+                    <td><strong>#{product.id}</strong></td>
                     <td>
-                      {product.imageUrl && (
-                        <a href={product.imageUrl} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-info">
-                          View Image
+                      <strong>{product.name}</strong>
+                    </td>
+                    <td>
+                      <small className="text-muted">
+                        {product.description || <em>No description</em>}
+                      </small>
+                    </td>
+                    <td className="text-end">
+                      <span className="fw-bold text-success">
+                        ${product.price ? parseFloat(product.price).toFixed(2) : '0.00'}
+                      </span>
+                    </td>
+                    <td className="text-center">
+                      {product.imageUrl ? (
+                        <a
+                          href={product.imageUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-sm btn-outline-info"
+                          title="View Image"
+                        >
+                          <i className="bi bi-image"></i>
                         </a>
+                      ) : (
+                        <span className="text-muted">—</span>
                       )}
                     </td>
-                    <td>{product.categoryId}</td>
                     <td>
-                      <button onClick={() => onEditProduct(product)} className="btn btn-sm btn-primary me-2">
+                      <span className="badge bg-secondary">Category #{product.categoryId}</span>
+                    </td>
+                    <td className="text-center">
+                      <button
+                        onClick={() => onEditProduct(product)}
+                        className="btn btn-sm btn-outline-primary me-2"
+                        title="Edit Product"
+                      >
+                        <i className="bi bi-pencil me-1"></i>
                         Edit
                       </button>
-                      <button onClick={() => handleDelete(product.id)} className="btn btn-sm btn-danger">
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="btn btn-sm btn-outline-danger"
+                        title="Delete Product"
+                      >
+                        <i className="bi bi-trash me-1"></i>
                         Delete
                       </button>
                     </td>

@@ -71,9 +71,12 @@ const CreatePromotion = ({ onPromotionCreated }) => {
   };
 
   return (
-    <div className="card my-4">
-      <div className="card-header">
-        <h3>Create New Promotion</h3>
+    <div className="card shadow-sm border-0">
+      <div className="card-header bg-success text-white">
+        <h4 className="mb-0">
+          <i className="bi bi-percent me-2"></i>
+          Create New Promotion
+        </h4>
       </div>
       <div className="card-body">
         <form onSubmit={handleSubmit}>
@@ -173,11 +176,33 @@ const CreatePromotion = ({ onPromotionCreated }) => {
               onChange={handleChange}
             />
           </div>
-          <button type="submit" className="btn btn-success" disabled={loading}>
-            {loading ? 'Creating...' : 'Create Promotion'}
-          </button>
-          {error && <div className="alert alert-danger mt-3">{error}</div>}
-          {success && <div className="alert alert-success mt-3">Promotion created successfully!</div>}
+          <div className="d-grid gap-2">
+            <button type="submit" className="btn btn-success btn-lg" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-check-circle me-2"></i>
+                  Create Promotion
+                </>
+              )}
+            </button>
+          </div>
+          {error && (
+            <div className="alert alert-danger mt-3 d-flex align-items-center">
+              <i className="bi bi-exclamation-circle me-2"></i>
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="alert alert-success mt-3 d-flex align-items-center">
+              <i className="bi bi-check-circle me-2"></i>
+              Promotion created successfully!
+            </div>
+          )}
         </form>
       </div>
     </div>

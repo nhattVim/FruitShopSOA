@@ -51,51 +51,110 @@ public class OrderService {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (OrderItem item : order.getOrderItems()) {
-            // Call Inventory Service to check stock and reserve
-            Boolean isInStock = webClientBuilder.build().get()
-                    .uri("http://inventory-service/api/inventory/inStock/" + item.getProductId())
-                    .retrieve()
-                    .bodyToMono(Boolean.class)
-                    .block(); // Blocking call for simplicity, consider async in real app
+            try {
+                // Call Inventory Service to check stock and reserve
+                Boolean isInStock = webClientBuilder.build().get()
+                        .uri("http://inventory-service/api/inventory/inStock/" + item.getProductId())
+                        .retrieve()
+                        .bodyToMono(Boolean.class)
+                        .timeout(java.time.Duration.ofSeconds(5))
+                        .block(); // Blocking call for simplicity, consider async in real app
 
-            if (Boolean.FALSE.equals(isInStock)) {
-                throw new IllegalArgumentException("Product " + item.getProductId() + " is not in stock, please try again later.");
-            }
+                if (Boolean.FALSE.equals(isInStock)) {
+                    throw new IllegalArgumentException("Product " + item.getProductId() + " is not in stock, please try again later.");
+                }
 
-            // Deduct stock
-            Boolean deducted = webClientBuilder.build().post()
-                    .uri("http://inventory-service/api/inventory/outbound/" + item.getProductId() + "?quantity=" + item.getQuantity())
-                    .retrieve()
-                    .bodyToMono(Boolean.class)
-                    .block();
+                // Get current inventory to check available quantity before deducting
+                InventoryResponse inventoryResponse = null;
+                try {
+                    inventoryResponse = webClientBuilder.build().get()
+                            .uri("http://inventory-service/api/inventory/" + item.getProductId())
+                            .retrieve()
+                            .bodyToMono(InventoryResponse.class)
+                            .timeout(java.time.Duration.ofSeconds(5))
+                            .block();
+                } catch (Exception e) {
+                    log.warn("Could not fetch inventory details for product {}, proceeding with deduction", item.getProductId());
+                }
 
-            if (Boolean.FALSE.equals(deducted)) {
-                throw new IllegalArgumentException("Failed to deduct stock for product " + item.getProductId());
-            }
+                // Deduct stock
+                Boolean deducted = webClientBuilder.build().post()
+                        .uri("http://inventory-service/api/inventory/outbound/" + item.getProductId() + "?quantity=" + item.getQuantity())
+                        .retrieve()
+                        .bodyToMono(Boolean.class)
+                        .timeout(java.time.Duration.ofSeconds(5))
+                        .block();
 
-            // Call Pricing Service to get unit price
-            PriceResponse priceResponse = webClientBuilder.build().get()
-                    .uri("http://pricing-service/api/pricing/price/" + item.getProductId())
-                    .retrieve()
-                    .bodyToMono(PriceResponse.class)
-                    .block();
+                if (Boolean.FALSE.equals(deducted)) {
+                    String errorMsg;
+                    if (inventoryResponse == null) {
+                        errorMsg = String.format("Product %d has no inventory record. Please add inventory first.", item.getProductId());
+                    } else if (inventoryResponse.getQuantity() < item.getQuantity()) {
+                        errorMsg = String.format("Insufficient stock for product %d. Available: %d, Requested: %d", 
+                                item.getProductId(), inventoryResponse.getQuantity(), item.getQuantity());
+                    } else {
+                        errorMsg = String.format("Failed to deduct stock for product %d. Please try again.", item.getProductId());
+                    }
+                    throw new IllegalArgumentException(errorMsg);
+                }
 
-            if (priceResponse != null && priceResponse.getCurrentPrice() != null) {
-                item.setUnitPrice(priceResponse.getCurrentPrice());
-                totalAmount = totalAmount.add(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-            } else {
-                throw new IllegalArgumentException("Could not retrieve price for product " + item.getProductId());
+                // Call Pricing Service to get unit price
+                PriceResponse priceResponse = webClientBuilder.build().get()
+                        .uri("http://pricing-service/api/pricing/price/" + item.getProductId())
+                        .retrieve()
+                        .bodyToMono(PriceResponse.class)
+                        .timeout(java.time.Duration.ofSeconds(5))
+                        .block();
+
+                if (priceResponse != null && priceResponse.getCurrentPrice() != null) {
+                    item.setUnitPrice(priceResponse.getCurrentPrice());
+                    totalAmount = totalAmount.add(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                } else {
+                    throw new IllegalArgumentException("Could not retrieve price for product " + item.getProductId());
+                }
+            } catch (org.springframework.web.reactive.function.client.WebClientException e) {
+                log.error("Error calling service for product {}", item.getProductId(), e);
+                throw new RuntimeException("Service unavailable: Unable to process order. Please try again later.", e);
+            } catch (RuntimeException e) {
+                // Handle timeout and other reactor exceptions
+                // Timeout exceptions from Reactor are wrapped in RuntimeException
+                Throwable cause = e.getCause();
+                String message = e.getMessage();
+                String className = e.getClass().getName();
+                
+                // Check for timeout-related exceptions
+                if (cause instanceof java.util.concurrent.TimeoutException || 
+                    (message != null && message.toLowerCase().contains("timeout")) ||
+                    className.contains("Timeout")) {
+                    log.error("Timeout while calling service for product {}", item.getProductId(), e);
+                    throw new RuntimeException("Service timeout: Unable to process order. Please try again later.", e);
+                }
+                log.error("Error processing order item for product {}", item.getProductId(), e);
+                throw e;
+            } catch (Exception e) {
+                log.error("Unexpected error processing order item for product {}", item.getProductId(), e);
+                throw e;
             }
         }
         order.setTotalAmount(totalAmount);
-        orderRepository.save(order);
-
-        // Ensure order items are saved with the order reference
+        
+        // Set the order reference on all order items BEFORE saving
+        // This is required because OrderItem.order is marked as nullable=false
+        // and the Order entity has cascade=CascadeType.ALL
         order.getOrderItems().forEach(orderItem -> orderItem.setOrder(order));
-        orderItemRepository.saveAll(order.getOrderItems());
+        
+        // Save the order (this will cascade save the order items due to CascadeType.ALL)
+        orderRepository.save(order);
 
         log.info("Order {} created successfully for customer {}", order.getOrderNumber(), order.getCustomerId());
         return order.getOrderNumber();
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(this::mapToOrderResponse)
+                .toList();
     }
 
     @Transactional(readOnly = true)

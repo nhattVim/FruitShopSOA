@@ -37,39 +37,84 @@ const CategoryList = ({ onEditCategory, refreshTrigger }) => {
     }
   };
 
-  if (loading) return <div className="text-center my-4">Loading categories...</div>;
-  if (error) return <div className="alert alert-danger" role="alert">Error: {error}</div>;
+  if (loading) {
+    return (
+      <div className="card shadow-sm border-0">
+        <div className="card-body text-center py-5">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-3 text-muted">Loading categories...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-danger d-flex align-items-center" role="alert">
+        <i className="bi bi-exclamation-circle me-2"></i>
+        <div>Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="card my-4">
-      <div className="card-header">
-        <h3>Available Categories</h3>
+    <div className="card shadow-sm border-0">
+      <div className="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 className="mb-0">
+          <i className="bi bi-list-ul me-2"></i>
+          All Categories
+        </h5>
+        <button className="btn btn-sm btn-outline-primary" onClick={fetchCategories}>
+          <i className="bi bi-arrow-clockwise me-1"></i>
+          Refresh
+        </button>
       </div>
       <div className="card-body">
         {categories.length === 0 ? (
-          <p className="text-center">No categories found. Add some!</p>
+          <div className="text-center py-5">
+            <i className="bi bi-inbox display-1 text-muted"></i>
+            <p className="mt-3 text-muted">No categories found. Add your first category to get started!</p>
+          </div>
         ) : (
           <div className="table-responsive">
-            <table className="table table-striped table-hover">
-              <thead>
+            <table className="table table-hover align-middle">
+              <thead className="table-light">
                 <tr>
                   <th>ID</th>
                   <th>Name</th>
                   <th>Description</th>
-                  <th>Actions</th>
+                  <th className="text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {categories.map((category) => (
                   <tr key={category.id}>
-                    <td>{category.id}</td>
-                    <td>{category.name}</td>
-                    <td>{category.description}</td>
+                    <td><strong>#{category.id}</strong></td>
                     <td>
-                      <button onClick={() => onEditCategory(category)} className="btn btn-sm btn-primary me-2">
+                      <strong>{category.name}</strong>
+                    </td>
+                    <td>
+                      <small className="text-muted">
+                        {category.description || <em>No description</em>}
+                      </small>
+                    </td>
+                    <td className="text-center">
+                      <button
+                        onClick={() => onEditCategory(category)}
+                        className="btn btn-sm btn-outline-primary me-2"
+                        title="Edit Category"
+                      >
+                        <i className="bi bi-pencil me-1"></i>
                         Edit
                       </button>
-                      <button onClick={() => handleDelete(category.id)} className="btn btn-sm btn-danger">
+                      <button
+                        onClick={() => handleDelete(category.id)}
+                        className="btn btn-sm btn-outline-danger"
+                        title="Delete Category"
+                      >
+                        <i className="bi bi-trash me-1"></i>
                         Delete
                       </button>
                     </td>

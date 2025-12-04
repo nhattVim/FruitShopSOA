@@ -61,9 +61,12 @@ const SetPrice = ({ onPriceSet }) => {
   };
 
   return (
-    <div className="card my-4">
-      <div className="card-header">
-        <h3>Set Product Price</h3>
+    <div className="card shadow-sm border-0">
+      <div className="card-header bg-primary text-white">
+        <h4 className="mb-0">
+          <i className="bi bi-tag me-2"></i>
+          Set Product Price
+        </h4>
       </div>
       <div className="card-body">
         <form onSubmit={handleSubmit}>
@@ -116,11 +119,33 @@ const SetPrice = ({ onPriceSet }) => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-success" disabled={loading}>
-            {loading ? 'Setting Price...' : 'Set Price'}
-          </button>
-          {error && <div className="alert alert-danger mt-3">{error}</div>}
-          {success && <div className="alert alert-success mt-3">Price set successfully!</div>}
+          <div className="d-grid gap-2">
+            <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Setting Price...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-check-circle me-2"></i>
+                  Set Price
+                </>
+              )}
+            </button>
+          </div>
+          {error && (
+            <div className="alert alert-danger mt-3 d-flex align-items-center">
+              <i className="bi bi-exclamation-circle me-2"></i>
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="alert alert-success mt-3 d-flex align-items-center">
+              <i className="bi bi-check-circle me-2"></i>
+              Price set successfully!
+            </div>
+          )}
         </form>
       </div>
     </div>

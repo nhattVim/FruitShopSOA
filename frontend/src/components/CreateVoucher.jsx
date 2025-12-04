@@ -70,9 +70,12 @@ const CreateVoucher = ({ onVoucherCreated }) => {
   };
 
   return (
-    <div className="card my-4">
-      <div className="card-header">
-        <h3>Create New Voucher</h3>
+    <div className="card shadow-sm border-0">
+      <div className="card-header bg-info text-white">
+        <h4 className="mb-0">
+          <i className="bi bi-ticket-perforated me-2"></i>
+          Create New Voucher
+        </h4>
       </div>
       <div className="card-body">
         <form onSubmit={handleSubmit}>
@@ -173,11 +176,33 @@ const CreateVoucher = ({ onVoucherCreated }) => {
             />
             <label className="form-check-label" htmlFor="active">Active</label>
           </div>
-          <button type="submit" className="btn btn-success" disabled={loading}>
-            {loading ? 'Creating...' : 'Create Voucher'}
-          </button>
-          {error && <div className="alert alert-danger mt-3">{error}</div>}
-          {success && <div className="alert alert-success mt-3">Voucher created successfully!</div>}
+          <div className="d-grid gap-2">
+            <button type="submit" className="btn btn-info btn-lg text-white" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-check-circle me-2"></i>
+                  Create Voucher
+                </>
+              )}
+            </button>
+          </div>
+          {error && (
+            <div className="alert alert-danger mt-3 d-flex align-items-center">
+              <i className="bi bi-exclamation-circle me-2"></i>
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="alert alert-success mt-3 d-flex align-items-center">
+              <i className="bi bi-check-circle me-2"></i>
+              Voucher created successfully!
+            </div>
+          )}
         </form>
       </div>
     </div>

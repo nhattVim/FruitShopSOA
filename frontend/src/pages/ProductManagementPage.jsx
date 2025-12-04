@@ -3,30 +3,29 @@ import React, { useState } from 'react';
 import ProductList from '../components/ProductList';
 import AddProduct from '../components/AddProduct';
 import EditProduct from '../components/EditProduct';
-// import './ProductManagementPage.css'; // Removed, using Bootstrap
 
 const ProductManagementPage = () => {
-  const [editingProduct, setEditingProduct] = useState(null); // Stores product object being edited
+  const [editingProduct, setEditingProduct] = useState(null);
   const [showAddProductForm, setShowAddProductForm] = useState(false);
-  const [refreshCounter, setRefreshCounter] = useState(0); // Used to trigger ProductList refresh
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   const triggerRefresh = () => {
     setRefreshCounter(prev => prev + 1);
   };
 
   const handleProductAdded = () => {
-    setShowAddProductForm(false); // Hide form after adding
-    triggerRefresh(); // Refresh list
+    setShowAddProductForm(false);
+    triggerRefresh();
   };
 
   const handleProductUpdated = () => {
-    setEditingProduct(null); // Hide edit form after updating
-    triggerRefresh(); // Refresh list
+    setEditingProduct(null);
+    triggerRefresh();
   };
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
-    setShowAddProductForm(false); // Hide add form if showing
+    setShowAddProductForm(false);
   };
 
   const handleCancelEdit = () => {
@@ -34,22 +33,37 @@ const ProductManagementPage = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">Product Management</h2>
-
-      <div className="mb-3 d-flex justify-content-end">
-        <button className="btn btn-success me-2" onClick={() => {
-          setShowAddProductForm(true);
-          setEditingProduct(null); // Ensure edit form is hidden
-        }}>
-          Add New Product
-        </button>
-        <button className="btn btn-info" onClick={() => {
-          setShowAddProductForm(false);
-          setEditingProduct(null); // Ensure edit form is hidden
-        }}>
-          View All Products
-        </button>
+    <div className="container-fluid mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="mb-0">
+          <i className="bi bi-box-seam me-2"></i>
+          Product Management
+        </h2>
+        <div>
+          {!showAddProductForm && !editingProduct ? (
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={() => {
+                setShowAddProductForm(true);
+                setEditingProduct(null);
+              }}
+            >
+              <i className="bi bi-plus-circle me-2"></i>
+              Add New Product
+            </button>
+          ) : (
+            <button
+              className="btn btn-outline-secondary btn-lg"
+              onClick={() => {
+                setShowAddProductForm(false);
+                setEditingProduct(null);
+              }}
+            >
+              <i className="bi bi-arrow-left me-2"></i>
+              Back to Products
+            </button>
+          )}
+        </div>
       </div>
 
       {showAddProductForm && (

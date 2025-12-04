@@ -45,6 +45,12 @@ public class InventoryController {
         return inventoryService.getExpiringItems(thresholdDate);
     }
 
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<InventoryResponse> getAllInventory() {
+        return inventoryService.getAllInventory();
+    }
+
     @GetMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public InventoryResponse getInventoryByProductId(@PathVariable Long productId) {

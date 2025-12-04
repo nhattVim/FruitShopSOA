@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
@@ -25,6 +27,12 @@ public class OrderController {
     public ResponseEntity<String> placeOrder(@RequestBody OrderRequest orderRequest) {
         String orderNumber = orderService.createOrder(orderRequest);
         return new ResponseEntity<>(orderNumber, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<OrderResponse> getAllOrders() {
+        return orderService.getAllOrders();
     }
 
     @GetMapping("/{id}")

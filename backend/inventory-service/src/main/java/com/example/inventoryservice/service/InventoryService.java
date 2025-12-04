@@ -75,6 +75,13 @@ public class InventoryService {
     }
 
     @Transactional(readOnly = true)
+    public List<InventoryResponse> getAllInventory() {
+        return inventoryRepository.findAll().stream()
+                .map(this::mapToInventoryResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public InventoryResponse getInventoryByProductId(Long productId) {
         return inventoryRepository.findByProductId(productId)
                 .map(this::mapToInventoryResponse)
