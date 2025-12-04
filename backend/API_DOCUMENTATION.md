@@ -250,7 +250,35 @@ The backend consists of several independent microservices communicating primaril
     ]
     ```
 
-#### 2.2.4. Get Inventory Details by Product ID
+#### 2.2.4. Get All Inventory
+-   **Endpoint:** `GET /api/inventory`
+-   **Description:** Retrieves a list of all inventory records in the system.
+-   **Response Status:** `200 OK`
+-   **Response Body:** `List<InventoryResponse>`
+    ```json
+    [
+      {
+        "id": 101,
+        "productId": 1,
+        "quantity": 150,
+        "batchId": "BATCH-20231026-001",
+        "importDate": "2023-10-26",
+        "expirationDate": "2024-10-26",
+        "unitOfMeasure": "kg"
+      },
+      {
+        "id": 102,
+        "productId": 2,
+        "quantity": 200,
+        "batchId": "BATCH-20231027-001",
+        "importDate": "2023-10-27",
+        "expirationDate": "2023-11-10",
+        "unitOfMeasure": "unit"
+      }
+    ]
+    ```
+
+#### 2.2.5. Get Inventory Details by Product ID
 -   **Endpoint:** `GET /api/inventory/{productId}`
 -   **Description:** Retrieves detailed inventory information for a specific product.
 -   **Path Parameters:**
@@ -286,6 +314,7 @@ The backend consists of several independent microservices communicating primaril
     2000.0
     ```
     -   `400 Bad Request`: If conversion rule is not found or parameters are invalid.
+    -   **Note:** This endpoint must be defined before the `/{productId}` endpoint to avoid routing conflicts.
 
 ---
 
@@ -428,8 +457,41 @@ The backend consists of several independent microservices communicating primaril
     "d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"
     ```
     -   `400 Bad Request`: If products are out of stock or pricing information is unavailable.
+    -   `503 Service Unavailable`: If circuit breaker is triggered (fallback response: "Oops! Something went wrong, please order after some time!")
 
-#### 4.1.2. Get Order by ID
+#### 4.1.2. Get All Orders
+-   **Endpoint:** `GET /api/order`
+-   **Description:** Retrieves a list of all orders in the system.
+-   **Response Status:** `200 OK`
+-   **Response Body:** `List<OrderResponse>`
+    ```json
+    [
+      {
+        "id": 1,
+        "orderNumber": "d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a",
+        "customerId": 10,
+        "orderDate": "2023-11-15T10:30:00",
+        "status": "NEW",
+        "totalAmount": 7.49,
+        "orderItems": [
+          {
+            "id": 101,
+            "productId": 1,
+            "quantity": 2,
+            "unitPrice": 2.50
+          },
+          {
+            "id": 102,
+            "productId": 3,
+            "quantity": 1,
+            "unitPrice": 2.49
+          }
+        ]
+      }
+    ]
+    ```
+
+#### 4.1.3. Get Order by ID
 -   **Endpoint:** `GET /api/order/{id}`
 -   **Description:** Retrieves a single order by its unique ID.
 -   **Path Parameters:**
@@ -462,7 +524,7 @@ The backend consists of several independent microservices communicating primaril
     ```
     -   `404 Not Found`: If order with `id` does not exist.
 
-#### 4.1.3. Update Order Status
+#### 4.1.4. Update Order Status
 -   **Endpoint:** `PUT /api/order/{id}/status`
 -   **Description:** Updates the status of an existing order.
 -   **Path Parameters:**

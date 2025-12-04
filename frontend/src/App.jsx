@@ -166,13 +166,6 @@ function Sidebar({ isOpen, onToggle }) {
                         <i className="bi bi-shop fs-3 text-white me-2"></i>
                         {isOpen && <span className="sidebar-brand">Fruit Shop</span>}
                     </div>
-                    <button 
-                        className="btn btn-link text-white p-0 sidebar-toggle"
-                        onClick={onToggle}
-                        title={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
-                    >
-                        <i className={`bi ${isOpen ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
-                    </button>
                 </div>
                 
                 <nav className="sidebar-nav">
