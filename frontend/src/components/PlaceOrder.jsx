@@ -74,9 +74,11 @@ const PlaceOrder = ({ onOrderPlaced }) => {
 
       // Fetch prices
       if (Object.keys(pricePromises).length > 0) {
-        const priceResults = await Promise.allSettled(Object.values(pricePromises));
+        // Create array of [productId, promise] pairs to maintain correct mapping
+        const priceEntries = Object.entries(pricePromises);
+        const priceResults = await Promise.allSettled(priceEntries.map(([, promise]) => promise));
         const newPrices = { ...productPrices };
-        Object.keys(pricePromises).forEach((productId, index) => {
+        priceEntries.forEach(([productId], index) => {
           const result = priceResults[index];
           if (result.status === 'fulfilled' && result.value) {
             newPrices[parseInt(productId, 10)] = result.value.currentPrice || result.value;
@@ -87,9 +89,11 @@ const PlaceOrder = ({ onOrderPlaced }) => {
 
       // Fetch stock status
       if (Object.keys(stockPromises).length > 0) {
-        const stockResults = await Promise.allSettled(Object.values(stockPromises));
+        // Create array of [productId, promise] pairs to maintain correct mapping
+        const stockEntries = Object.entries(stockPromises);
+        const stockResults = await Promise.allSettled(stockEntries.map(([, promise]) => promise));
         const newStock = { ...productStock };
-        Object.keys(stockPromises).forEach((productId, index) => {
+        stockEntries.forEach(([productId], index) => {
           const result = stockResults[index];
           if (result.status === 'fulfilled') {
             newStock[parseInt(productId, 10)] = result.value;

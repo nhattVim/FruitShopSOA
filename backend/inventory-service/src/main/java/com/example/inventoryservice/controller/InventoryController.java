@@ -51,12 +51,6 @@ public class InventoryController {
         return inventoryService.getAllInventory();
     }
 
-    @GetMapping("/{productId}")
-    @ResponseStatus(HttpStatus.OK)
-    public InventoryResponse getInventoryByProductId(@PathVariable Long productId) {
-        return inventoryService.getInventoryByProductId(productId);
-    }
-
     @GetMapping("/convert")
     @ResponseStatus(HttpStatus.OK)
     public Double convertUnits(@RequestParam Long productId,
@@ -64,5 +58,11 @@ public class InventoryController {
                                @RequestParam String fromUnit,
                                @RequestParam String toUnit) {
         return inventoryService.convertUnits(productId, quantity, fromUnit, toUnit);
+    }
+
+    @GetMapping("/{productId}")
+    @ResponseStatus(HttpStatus.OK)
+    public InventoryResponse getInventoryByProductId(@PathVariable Long productId) {
+        return inventoryService.getInventoryByProductId(productId);
     }
 }
