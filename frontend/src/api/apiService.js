@@ -9,6 +9,21 @@ const apiService = axios.create({
     },
 });
 
+// Add a request interceptor to include the JWT token
+apiService.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+
 // Generic GET request
 export const get = async (url) => {
     try {
@@ -52,6 +67,11 @@ export const remove = async (url) => {
         throw error;
     }
 };
+
+// --- Auth Service API ---
+export const login = (credentials) => post("/auth/token", credentials);
+export const register = (user) => post("/auth/register", user);
+export const validateToken = (token) => get(`/auth/validate?token=${token}`);
 
 // --- Product Service API ---
 
