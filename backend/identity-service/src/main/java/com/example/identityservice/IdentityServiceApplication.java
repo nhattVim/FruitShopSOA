@@ -1,8 +1,13 @@
 package com.example.identityservice;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import com.example.identityservice.entity.UserCredential;
+import com.example.identityservice.repository.UserCredentialRepository;
+import com.example.identityservice.service.AuthService;
 
 @SpringBootApplication
 public class IdentityServiceApplication {
@@ -12,10 +17,10 @@ public class IdentityServiceApplication {
 	}
 
 	@Bean
-	public org.springframework.boot.CommandLineRunner commandLineRunner(com.example.identityservice.service.AuthService service, com.example.identityservice.repository.UserCredentialRepository repository) {
+	public CommandLineRunner commandLineRunner(AuthService service, UserCredentialRepository repository) {
 		return args -> {
 			if (repository.findByUsername("admin").isEmpty()) {
-				com.example.identityservice.entity.UserCredential admin = new com.example.identityservice.entity.UserCredential();
+				UserCredential admin = new UserCredential();
 				admin.setUsername("admin");
 				admin.setPassword("admin123");
 				admin.setEmail("admin@fruitshop.com");
@@ -23,9 +28,9 @@ public class IdentityServiceApplication {
 				service.saveUser(admin);
 				System.out.println("Valid admin user created: admin/admin123");
 			}
-			
+
 			if (repository.findByUsername("staff").isEmpty()) {
-				com.example.identityservice.entity.UserCredential staff = new com.example.identityservice.entity.UserCredential();
+				UserCredential staff = new UserCredential();
 				staff.setUsername("staff");
 				staff.setPassword("staff123");
 				staff.setEmail("staff@fruitshop.com");

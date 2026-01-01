@@ -42,9 +42,6 @@ public class AuthConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        // Compiler complained "required: UserDetailsService", "found: no arguments".
-        // Also "cannot find symbol method setUserDetailsService".
-        // So I AM USING THE CONSTRUCTOR.
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;

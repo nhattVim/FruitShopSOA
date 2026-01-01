@@ -13,7 +13,7 @@ import java.util.Map;
 @Component
 public class JwtService {
 
-    public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+    public static final String SECRET = "NHAT_TRUONG_DEP_TRAI_VO_DICH_SIEU_CAP_VIP_PRO_MAX_GALAXY_ULTRA_PLUS_PLUS";
 
     public void validateToken(final String token) {
         Jwts.parser().verifyWith(getSignKey()).build().parseSignedClaims(token);

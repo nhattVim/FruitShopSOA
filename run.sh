@@ -22,6 +22,10 @@ declare -A GATEWAY=(
     ["api-gateway"]="8080"
 )
 
+declare -A APP=(
+    ["ui"]="5173"
+)
+
 wait_for_port() {
     local port=$1
     local name=$2
@@ -71,6 +75,12 @@ start_gateway() {
     done
 }
 
+start_ui() {
+    echo "🚀 Starting UI on port 5173"
+    cd "$ROOT_DIR/frontend" && npm run dev &
+    wait_for_port "${APP["ui"]}" "UI"
+}
+
 stop_ports() {
     echo "🛑 Stopping all microservices..."
 
@@ -79,6 +89,7 @@ stop_ports() {
     for p in "${DISCOVERY[@]}"; do ports+=("$p"); done
     for p in "${SERVICES[@]}"; do ports+=("$p"); done
     for p in "${GATEWAY[@]}"; do ports+=("$p"); done
+    for p in "${APP[@]}"; do ports+=("$p"); done
 
     for port in "${ports[@]}"; do
         pids=$(lsof -t -i:"$port" 2>/dev/null || true)
@@ -98,6 +109,7 @@ start)
     start_discovery
     start_services
     start_gateway
+    start_ui
     echo "✨ All services started successfully!"
     ;;
 stop)

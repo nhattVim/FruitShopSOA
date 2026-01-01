@@ -1,15 +1,15 @@
 package com.example.apigateway.filter;
 
-import com.example.apigateway.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
+
+import com.example.apigateway.util.JwtUtil;
+
+import io.jsonwebtoken.Claims;
 
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
@@ -71,8 +71,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             if (path.contains("/api/product") && !method.equals("GET")) {
                 return false; // Staff can only view products
             }
-            if (path.contains("/api/inventory") && 
-                (path.contains("/inbound") || method.equals("DELETE"))) {
+            if (path.contains("/api/inventory") &&
+                    (path.contains("/inbound") || method.equals("DELETE"))) {
                 return false; // Staff cannot add inbound or delete inventory
             }
             // Add more specific rules as needed

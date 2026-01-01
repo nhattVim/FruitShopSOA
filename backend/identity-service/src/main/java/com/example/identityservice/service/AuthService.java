@@ -1,21 +1,20 @@
 package com.example.identityservice.service;
 
-import com.example.identityservice.dto.AuthRequest;
-import com.example.identityservice.entity.UserCredential;
-import com.example.identityservice.repository.UserCredentialRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.identityservice.entity.UserCredential;
+import com.example.identityservice.repository.UserCredentialRepository;
+
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    @Autowired
-    private UserCredentialRepository repository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private JwtService jwtService;
+    private final UserCredentialRepository repository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public String saveUser(UserCredential credential) {
         credential.setPassword(passwordEncoder.encode(credential.getPassword()));
@@ -24,8 +23,8 @@ public class AuthService {
     }
 
     public String generateToken(String username) {
-        // Fetch role from DB
-        UserCredential user = repository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        UserCredential user = repository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return jwtService.generateToken(username, user.getRole());
     }
 
