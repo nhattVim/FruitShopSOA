@@ -71,8 +71,12 @@ echo ========================================================
 call :LAUNCH_FRONTEND "%FRONTEND_DIR%"
 
 echo.
-echo [*] All services & frontend started! Exiting launcher...
-timeout /t 5 >nul
+echo [*] All services & frontend started!
+echo [*] Waiting for Frontend (5173) to be ready before opening browser...
+
+:: Call the wait and open function (Port 5173, URL http://localhost:5173)
+call :wait_and_open_impl 5173 "http://localhost:5173"
+
 exit
 
 :: ==========================================
@@ -135,3 +139,27 @@ if %COUNT% GEQ 60 (
     exit /b 1
 )
 goto :WAIT_LOOP
+
+:: ============================================================
+:: IMPLEMENTATION: WAIT AND OPEN BROWSER
+:: ============================================================
+:wait_and_open_impl
+:: %1 = Port, %2 = Target URL
+set "TARGET_PORT=%1"
+set "TARGET_URL=%~2"
+
+echo Waiting for port %TARGET_PORT% to become active...
+:: Loop 60 times, 1s/time (Timeout 60s)
+for /L %%i in (1,1,60) do (
+    netstat -an | find ":%TARGET_PORT%" | find "LISTENING" >nul
+    if !errorlevel! equ 0 (
+        echo.
+        echo [OK] Server UP on port %TARGET_PORT%! Opening browser...
+        start "" "%TARGET_URL%"
+        exit
+    )
+    timeout /t 1 >nul
+)
+echo.
+echo [!] Server start timeout (60s). Browser will not open automatically.
+exit
