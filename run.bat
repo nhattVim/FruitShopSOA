@@ -13,7 +13,7 @@ title Microservices Launcher
 :: IMPORTANT: These folders must exist inside the "backend" folder
 set "DISCOVERY_SVC=discovery-server:8761"
 set "GATEWAY_SVC=api-gateway:8080"
-set "MICROSERVICES=customer-service:8081 inventory-service:8082 order-service:8083 payment-service:8084 pricing-service:8085 product-service:8086"
+set "MICROSERVICES=customer-service:8081 inventory-service:8082 order-service:8083 payment-service:8084 pricing-service:8085 product-service:8086 identity-service:8087"
 
 :: Frontend Folder Name (Must exist in the same directory as this script)
 set "FRONTEND_DIR=frontend"

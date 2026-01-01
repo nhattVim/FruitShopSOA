@@ -15,6 +15,7 @@ declare -A SERVICES=(
     ["payment-service"]="8084"
     ["pricing-service"]="8085"
     ["product-service"]="8086"
+    ["identity-service"]="8087"
 )
 
 declare -A GATEWAY=(

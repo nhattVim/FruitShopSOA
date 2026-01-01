@@ -7,33 +7,58 @@ spring:
 
     cloud:
         gateway:
-            server:
-                webflux:
-                    routes:
-                        - id: product-service
-                          uri: lb://product-service
-                          predicates:
-                              - Path=/api/product/**,/api/category/**
-                        - id: inventory-service
-                          uri: lb://inventory-service
-                          predicates:
-                              - Path=/api/inventory/**
-                        - id: pricing-service
-                          uri: lb://pricing-service
-                          predicates:
-                              - Path=/api/pricing/**
-                        - id: order-service
-                          uri: lb://order-service
-                          predicates:
-                              - Path=/api/order/**
-                        - id: customer-service
-                          uri: lb://customer-service
-                          predicates:
-                              - Path=/api/customer/**
-                        - id: payment-service
-                          uri: lb://payment-service
-                          predicates:
-                              - Path=/api/payment/**
+            default-filters:
+                - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+            globalcors:
+                cors-configurations:
+                    '[/**]':
+                        allowedOrigins: "http://localhost:5173"
+                        allowedMethods: "*"
+                        allowedHeaders: "*"
+                        allowCredentials: true
+            routes:
+                - id: identity-service
+                  uri: lb://identity-service
+                  predicates:
+                      - Path=/api/auth/**
+                  filters:
+                    - StripPrefix=1
+                - id: product-service
+                  uri: lb://product-service
+                  predicates:
+                      - Path=/api/product/**,/api/category/**
+                  filters:
+                      - Authentication
+                - id: inventory-service
+                  uri: lb://inventory-service
+                  predicates:
+                      - Path=/api/inventory/**
+                  filters:
+                      - Authentication
+                - id: pricing-service
+                  uri: lb://pricing-service
+                  predicates:
+                      - Path=/api/pricing/**
+                  filters:
+                      - Authentication
+                - id: order-service
+                  uri: lb://order-service
+                  predicates:
+                      - Path=/api/order/**
+                  filters:
+                      - Authentication
+                - id: customer-service
+                  uri: lb://customer-service
+                  predicates:
+                      - Path=/api/customer/**
+                  filters:
+                      - Authentication
+                - id: payment-service
+                  uri: lb://payment-service
+                  predicates:
+                      - Path=/api/payment/**
+                  filters:
+                      - Authentication
 
 eureka:
     client:
