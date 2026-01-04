@@ -13,18 +13,21 @@
 - [4. Phân tích và thiết kế dữ liệu](#4-phân-tích-và-thiết-kế-dữ-liệu)
   - [4.1. Mô hình thực thể liên kết](#41-mô-hình-thực-thể-liên-kết)
   - [4.2. Mô hình quan hệ](#42-mô-hình-quan-hệ)
-- [5. Chi tiết các dịch vụ](#5-chi-tiết-các-dịch-vụ)
-  - [5.1. Api Gateway](#51-api-gateway)
-  - [5.2. Discovery Server](#52-discovery-server)
-  - [5.3. Identity Service](#53-identity-service)
-  - [5.4. Product Service](#54-product-service)
-  - [5.5. Order Service](#55-order-service)
-  - [5.6. Payment Service](#56-payment-service)
-  - [5.7. Pricing Service](#57-pricing-service)
-  - [5.8. Inventory Service](#58-inventory-service)
-- [6. Hướng dẫn cài đặt và chạy](#6-hướng-dẫn-cài-đặt-và-chạy)
-- [7. Kết quả đạt được](#7-kết-quả-đạt-được)
-- [8. Kết luận và hướng phát triển](#8-kết-luận-và-hướng-phát-triển)
+- [5. Kiến trúc hệ thống](#5-kiến-trúc-hệ-thống)
+  - [5.1. Tổng quan kiến trúc](#51-tổng-quan-kiến-trúc)
+  - [5.2. Công nghệ sử dụng](#52-công-nghệ-sử-dụng)
+- [6. Chi tiết các dịch vụ](#6-chi-tiết-các-dịch-vụ)
+  - [6.1. Api Gateway](#61-api-gateway)
+  - [6.2. Discovery Server](#62-discovery-server)
+  - [6.3. Identity Service](#63-identity-service)
+  - [6.4. Product Service](#64-product-service)
+  - [6.5. Order Service](#65-order-service)
+  - [6.6. Payment Service](#66-payment-service)
+  - [6.7. Pricing Service](#67-pricing-service)
+  - [6.8. Inventory Service](#68-inventory-service)
+- [7. Hướng dẫn cài đặt và chạy](#7-hướng-dẫn-cài-đặt-và-chạy)
+- [8. Kết quả đạt được](#8-kết-quả-đạt-được)
+- [9. Kết luận và hướng phát triển](#9-kết-luận-và-hướng-phát-triển)
 
 ## 1. Phát biểu bài toán
 
@@ -314,11 +317,9 @@ erDiagram
     PRODUCT ||--|| INVENTORY : has
 ```
 
-## 4. Kiến trúc hệ thống
+## 5. Kiến trúc hệ thống
 
-## 4. Kiến trúc hệ thống
-
-### 4.1 Tổng quan kiến trúc
+### 5.1 Tổng quan kiến trúc
 
 ```mermaid
 graph TD
@@ -333,7 +334,7 @@ graph TD
     C --> J[Inventory Service]
 ```
 
-### 4.2 Công nghệ sử dụng
+### 5.2 Công nghệ sử dụng
 
 #### Backend
 - **Spring Boot/Cloud**: Xây dựng các microservices
@@ -341,8 +342,7 @@ graph TD
 - **Eureka**: Service Discovery
 - **Spring Security**: Xác thực và phân quyền
 - **Spring Data JPA**: Truy vấn dữ liệu
-- **MySQL/PostgreSQL**: Cơ sở dữ liệu
-- **RabbitMQ/Kafka**: Message broker
+- **H2**: Cơ sở dữ liệu in-memory
 
 #### Frontend
 - **React.js/Vue.js**: Giao diện người dùng
@@ -350,50 +350,50 @@ graph TD
 - **Axios**: Gọi API
 - **Material-UI/Vuetify**: Component UI
 
-## 5. Chi tiết các dịch vụ
+## 6. Chi tiết các dịch vụ
 
-### 5.1 API Gateway
+### 6.1 API Gateway
 - Điểm vào duy nhất cho tất cả các yêu cầu
 - Định tuyến request đến các dịch vụ tương ứng
 - Xử lý xác thực và phân quyền
 - Cân bằng tải và giới hạn tốc độ
 
-### 5.2 Discovery Server
+### 6.2 Discovery Server
 - Đăng ký và phát hiện dịch vụ
 - Theo dõi trạng thái các dịch vụ
 - Hỗ trợ cân bằng tải động
 
-### 5.3 Identity Service
+### 6.3 Identity Service
 - Quản lý người dùng và phân quyền
 - Xác thực thông qua JWT
 - Quản lý phiên đăng nhập
 
-### 5.4 Product Service
+### 6.4 Product Service
 - Quản lý danh mục sản phẩm
 - Tìm kiếm và lọc sản phẩm
 - Đánh giá và bình luận sản phẩm
 
-### 5.5 Order Service
+### 6.5 Order Service
 - Tạo và quản lý đơn hàng
 - Theo dõi trạng thái đơn hàng
 - Lịch sử đặt hàng
 
-### 5.6 Payment Service
+### 6.6 Payment Service
 - Tích hợp cổng thanh toán
 - Quản lý giao dịch
 - Hoàn tiền và khiếu nại
 
-### 5.7 Pricing Service
+### 6.7 Pricing Service
 - Quản lý giá cả và khuyến mãi
 - Tính toán giảm giá
 - Chính sách giá theo mùa
 
-### 5.8 Inventory Service
+### 6.8 Inventory Service
 - Quản lý tồn kho
 - Cảnh báo hàng hết hàng
 - Đồng bộ số lượng tồn
 
-## 6. Hướng dẫn cài đặt và chạy
+## 7. Hướng dẫn cài đặt và chạy
 
 ### Yêu cầu hệ thống
 - JDK 11+
@@ -483,7 +483,7 @@ npm run dev
   - Ví dụ: http://localhost:8086/h2-console (Product Service)
   - Ví dụ: http://localhost:8081/h2-console (Customer Service)
 
-## 7. Kết quả đạt được
+## 8. Kết quả đạt được
 
 ### Chức năng đã hoàn thành
 - [x] Đăng nhập/đăng ký người dùng
@@ -498,7 +498,7 @@ npm run dev
 - Hỗ trợ hàng nghìn người dùng đồng thời
 - Khả năng mở rộng theo chiều ngang
 
-## 8. Kết luận và hướng phát triển
+## 9. Kết luận và hướng phát triển
 
 ### Kết luận
 Hệ thống đã đáp ứng được các yêu cầu cơ bản của một cửa hàng trái cây trực tuyến, với kiến trúc microservice giúp dễ dàng mở rộng và bảo trì.
@@ -513,5 +513,5 @@ Hệ thống đã đáp ứng được các yêu cầu cơ bản của một c�
 ## Tài liệu tham khảo
 1. Tài liệu Spring Boot: https://spring.io/projects/spring-boot
 2. Tài liệu Spring Cloud: https://spring.io/projects/spring-cloud
-3. Tài liệu React/Vue (tùy frontend sử dụng)
+3. Tài liệu React: https://react.dev/learn
 4. Tài liệu Microservices Architecture: https://microservices.io/
