@@ -109,13 +109,12 @@ Chi tiết về các API endpoints, request/response và các thông số kỹ t
 
     - Thêm, sửa, xóa sản phẩm và danh mục
     - Tìm kiếm và lọc sản phẩm
-    - Đánh giá và bình luận sản phẩm
 
-3. **Quản lý đơn hàng**
+3. **Quản lý đơn hàng (Admin/Staff)**
 
     - Tạo và theo dõi đơn hàng
-    - Hủy đơn hàng
-    - Lịch sử đơn hàng
+    - Cập nhật trạng thái đơn hàng
+    - Xem lịch sử đơn hàng
 
 4. **Quản lý kho hàng**
     - Nhập/xuất kho
@@ -146,7 +145,6 @@ graph TD
 
     C --> C1[Quản lý danh mục]
     C --> C2[Quản lý sản phẩm]
-    C --> C3[Đánh giá sản phẩm]
 
     D --> D1[Tạo đơn hàng]
     D --> D2[Theo dõi đơn hàng]
@@ -182,14 +180,12 @@ graph TD
     - Quản lý danh mục sản phẩm
     - Tìm kiếm và lọc sản phẩm
     - Quản lý thông tin chi tiết sản phẩm
-    - Đánh giá và bình luận sản phẩm
 
 4. **Dịch vụ Đơn hàng (Order Service)**
 
     - Tạo và quản lý đơn hàng
     - Theo dõi trạng thái đơn hàng
     - Lịch sử đơn hàng
-    - Quản lý giỏ hàng
 
 5. **Dịch vụ Kho hàng (Inventory Service)**
 
@@ -471,10 +467,10 @@ graph TD
 
 #### Frontend
 
--   **React.js/Vue.js**: Giao diện người dùng
--   **Redux/Vuex**: Quản lý state
+-   **React.js**: Giao diện người dùng
 -   **Axios**: Gọi API
--   **Material-UI/Vuetify**: Component UI
+-   **Bootstrap 5**: Component UI
+-   **React Router**: Định tuyến trang
 
 ## 6. Chi tiết các dịch vụ
 
@@ -501,7 +497,6 @@ graph TD
 
 -   Quản lý danh mục sản phẩm
 -   Tìm kiếm và lọc sản phẩm
--   Đánh giá và bình luận sản phẩm
 
 ### 6.5 Order Service
 
@@ -622,19 +617,25 @@ npm run dev
 -   **API Gateway**: http://localhost:8080
 -   **Eureka Dashboard**: http://localhost:8761
 -   **H2 Console** (Cho mỗi service): http://localhost:{port}/h2-console
-    -   Ví dụ: http://localhost:8086/h2-console (Product Service)
-    -   Ví dụ: http://localhost:8081/h2-console (Customer Service)
+    -   Product Service: http://localhost:8086/h2-console
+    -   Customer Service: http://localhost:8081/h2-console
+    -   Identity Service: http://localhost:8087/h2-console
+    -   Inventory Service: http://localhost:8082/h2-console
+    -   Order Service: http://localhost:8083/h2-console
+    -   Payment Service: http://localhost:8084/h2-console
+    -   Pricing Service: http://localhost:8085/h2-console
 
 ## 8. Kết quả đạt được
 
 ### Chức năng đã hoàn thành
 
--   [x] Đăng nhập/đăng ký người dùng
+-   [x] Đăng nhập người dùng (Admin/Staff)
 -   [x] Quản lý sản phẩm và danh mục
--   [x] Giỏ hàng và thanh toán
--   [x] Theo dõi đơn hàng
+-   [x] Quản lý đơn hàng
+-   [x] Theo dõi đơn hàng và trạng thái thanh toán
 -   [x] Quản lý kho hàng
--   [x] Khuyến mãi và giảm giá
+-   [x] Quản lý khuyến mãi và voucher
+-   [x] Quản lý khách hàng (tạo, sửa, xóa thông tin)
 
 ### Hiệu năng
 
@@ -650,11 +651,12 @@ Hệ thống đã đáp ứng được các yêu cầu cơ bản của một c�
 
 ### Hướng phát triển
 
--   Tích hợp thêm các phương thức thanh toán
+-   Phát triển giao diện khách hàng (Customer Portal) để khách hàng tự đặt hàng
+-   Tích hợp thêm các phương thức thanh toán (VNPay, Momo, v.v.)
 -   Phát triển ứng dụng di động
 -   Tích hợp AI để gợi ý sản phẩm
+-   Tích hợp hệ thống đánh giá sản phẩm
 -   Mở rộng hệ thống đa ngôn ngữ
--   Tích hợp hệ thống đánh giá và phản hồi
 
 ## Tài liệu tham khảo
 
