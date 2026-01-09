@@ -117,9 +117,11 @@ Chi tiết về các API endpoints, request/response và các thông số kỹ t
     - Xem lịch sử đơn hàng
 
 4. **Quản lý kho hàng**
-    - Nhập/xuất kho
+    - Nhập/xuất kho với quản lý lô hàng
     - Kiểm kê tồn kho
     - Cảnh báo hàng sắp hết
+    - Theo dõi hạn sử dụng sản phẩm
+    - Chuyển đổi đơn vị tính
 
 #### Yêu cầu phi chức năng
 
@@ -167,6 +169,7 @@ graph TD
     - Quản lý địa chỉ giao hàng
     - Theo dõi lịch sử mua hàng
     - Quản lý cấp độ thành viên
+    - Tích lũy và quản lý điểm thưởng (Membership Points)
 
 2. **Dịch vụ Xác thực (Identity Service)**
 
@@ -190,9 +193,12 @@ graph TD
 5. **Dịch vụ Kho hàng (Inventory Service)**
 
     - Quản lý tồn kho sản phẩm
-    - Cập nhật số lượng tồn kho
+    - Cập nhật số lượng tồn kho (nhập/xuất kho)
     - Kiểm tra tình trạng tồn kho
-    - Cảnh báo hàng sắp hết
+    - Quản lý lô hàng (Batch Management)
+    - Theo dõi ngày nhập và hạn sử dụng
+    - Cảnh báo sản phẩm sắp hết hạn
+    - Chuyển đổi đơn vị tính (kg, box, etc.)
 
 6. **Dịch vụ Định giá (Pricing Service)**
 
@@ -213,18 +219,19 @@ graph TD
 
 -   **API Endpoints**:
     -   `POST /api/customer`: Tạo mới khách hàng
+    -   `GET /api/customer`: Lấy danh sách tất cả khách hàng
     -   `GET /api/customer/{id}`: Lấy thông tin chi tiết khách hàng
     -   `PUT /api/customer/{id}`: Cập nhật thông tin khách hàng
     -   `DELETE /api/customer/{id}`: Xóa khách hàng
-    -   `GET /api/customer/{id}/orders`: Lấy lịch sử đơn hàng của khách hàng
+    -   `PUT /api/customer/{id}/points`: Thêm điểm thưởng cho khách hàng
+    -   `GET /api/customer/{id}/history`: Lấy lịch sử đơn hàng của khách hàng
 
 #### 3.5.2 Dịch vụ Xác thực
 
 -   **API Endpoints**:
+    -   `POST /api/auth/register`: Đăng ký người dùng mới
     -   `POST /api/auth/token`: Lấy token đăng nhập
-    -   `POST /api/auth/validate`: Xác thực token
-    -   `POST /api/auth/refresh`: Làm mới token
-    -   `GET /api/auth/user`: Lấy thông tin người dùng hiện tại
+    -   `GET /api/auth/validate`: Xác thực token
 
 #### 3.5.3 Dịch vụ Sản phẩm
 
@@ -234,42 +241,48 @@ graph TD
     -   `POST /api/product`: Thêm sản phẩm mới
     -   `PUT /api/product/{id}`: Cập nhật sản phẩm
     -   `DELETE /api/product/{id}`: Xóa sản phẩm
-    -   `GET /api/category`: Lấy danh mục sản phẩm
+    -   `GET /api/category`: Lấy danh sách danh mục
+    -   `GET /api/category/{id}`: Lấy chi tiết danh mục
     -   `POST /api/category`: Thêm danh mục mới
+    -   `PUT /api/category/{id}`: Cập nhật danh mục
+    -   `DELETE /api/category/{id}`: Xóa danh mục
 
 #### 3.5.4 Dịch vụ Đơn hàng
 
 -   **API Endpoints**:
     -   `POST /api/order`: Tạo đơn hàng mới
+    -   `GET /api/order`: Lấy danh sách tất cả đơn hàng
     -   `GET /api/order/{id}`: Lấy chi tiết đơn hàng
     -   `PUT /api/order/{id}/status`: Cập nhật trạng thái đơn hàng
     -   `GET /api/order/customer/{customerId}`: Lấy đơn hàng theo khách hàng
-    -   `DELETE /api/order/{id}`: Hủy đơn hàng
 
 #### 3.5.5 Dịch vụ Kho hàng
 
 -   **API Endpoints**:
-    -   `GET /api/inventory/product/{productId}`: Kiểm tra tồn kho sản phẩm
-    -   `POST /api/inventory/update`: Cập nhật số lượng tồn kho
-    -   `GET /api/inventory/low-stock`: Lấy danh sách sản phẩm sắp hết hàng
-    -   `POST /api/inventory/alert`: Thiết lập cảnh báo tồn kho
+    -   `GET /api/inventory/inStock/{productId}`: Kiểm tra sản phẩm còn hàng
+    -   `POST /api/inventory/inbound`: Ghi nhận nhập kho
+    -   `POST /api/inventory/outbound/{productId}`: Trừ tồn kho (xuất kho)
+    -   `GET /api/inventory/expiring`: Lấy danh sách sản phẩm sắp hết hạn
+    -   `GET /api/inventory`: Lấy danh sách toàn bộ tồn kho
+    -   `GET /api/inventory/{productId}`: Lấy thông tin tồn kho theo sản phẩm
+    -   `GET /api/inventory/convert`: Chuyển đổi đơn vị tính
 
 #### 3.5.6 Dịch vụ Định giá
 
 -   **API Endpoints**:
+    -   `POST /api/pricing/price`: Thiết lập giá cho sản phẩm
     -   `GET /api/pricing/price/{productId}`: Lấy giá sản phẩm
-    -   `POST /api/pricing/calculate`: Tính toán giá đơn hàng
-    -   `POST /api/pricing/discount`: Áp dụng khuyến mãi
-    -   `POST /api/pricing/voucher/apply`: Áp dụng voucher
-    -   `GET /api/pricing/voucher/validate`: Kiểm tra voucher
+    -   `POST /api/pricing/promotion`: Tạo chương trình khuyến mãi
+    -   `GET /api/pricing/promotion/apply/{productId}`: Áp dụng khuyến mãi cho sản phẩm
+    -   `POST /api/pricing/voucher`: Tạo voucher mới
+    -   `GET /api/pricing/voucher/apply`: Áp dụng voucher cho đơn hàng
 
 #### 3.5.7 Dịch vụ Thanh toán
 
 -   **API Endpoints**:
-    -   `POST /api/payment/process`: Xử lý thanh toán
-    -   `GET /api/payment/status/{orderId}`: Kiểm tra trạng thái thanh toán
-    -   `POST /api/payment/refund`: Yêu cầu hoàn tiền
-    -   `GET /api/payment/history`: Lịch sử giao dịch
+    -   `POST /api/payment`: Xử lý thanh toán đơn hàng
+    -   `GET /api/payment/{orderId}`: Kiểm tra trạng thái thanh toán
+    -   `GET /api/payment`: Lấy danh sách tất cả giao dịch thanh toán
 
 ### 3.6 Biểu đồ luồng dữ liệu
 
@@ -630,12 +643,17 @@ npm run dev
 ### Chức năng đã hoàn thành
 
 -   [x] Đăng nhập người dùng (Admin/Staff)
+-   [x] Đăng ký người dùng mới (Admin/Staff)
 -   [x] Quản lý sản phẩm và danh mục
 -   [x] Quản lý đơn hàng
 -   [x] Theo dõi đơn hàng và trạng thái thanh toán
--   [x] Quản lý kho hàng
+-   [x] Quản lý kho hàng (nhập/xuất kho, theo dõi lô hàng, hạn sử dụng)
 -   [x] Quản lý khuyến mãi và voucher
 -   [x] Quản lý khách hàng (tạo, sửa, xóa thông tin)
+-   [x] Quản lý điểm thưởng khách hàng (Membership Points)
+-   [x] Xem lịch sử mua hàng của khách hàng
+-   [x] Chuyển đổi đơn vị tính cho tồn kho
+-   [x] Cảnh báo sản phẩm sắp hết hạn
 
 ### Hiệu năng
 
